@@ -56,8 +56,8 @@ public class Order extends BaseEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Member_id", nullable = false)
-    private Member Member;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     /** 1:N 주문상품 */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
