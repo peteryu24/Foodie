@@ -1,16 +1,17 @@
 package com.sparta.tl3p.backend.domain.item.controller;
 
+import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
+import com.sparta.tl3p.backend.common.type.ResponseCode;
 import com.sparta.tl3p.backend.domain.item.dto.ItemCreateRequest;
-import com.sparta.tl3p.backend.domain.item.dto.ItemResponse;
 import com.sparta.tl3p.backend.domain.item.dto.ItemUpdateRequest;
 import com.sparta.tl3p.backend.domain.item.service.ItemService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -20,30 +21,58 @@ import java.util.UUID;
 public class ItemController {
     private final ItemService itemService;
 
-    @GetMapping
-    public ResponseEntity<List<ItemResponse>> getAllItems() {
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.getItems());
+    //    @GetMapping
+    //    public ResponseEntity<SuccessResponseDto> searchItems(
+    //            @Valid ItemSearchRequest request
+    //    ) {
+    //        return ResponseEntity.ok(SuccessResponseDto.builder()
+    //                .code(ResponseCode.S)
+    //                .message("상품 목록 조회 성공")
+    //                .data(itemService.searchItems(request))
+    //                .build());
+    //    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SuccessResponseDto> getItem(@PathVariable UUID id) {
+        return ResponseEntity.ok(SuccessResponseDto.builder()
+                .code(ResponseCode.S)
+                .message("상품 상세 조회 성공")
+                .data(itemService.getItem(id))
+                .build());
     }
 
     @PostMapping
-    public ResponseEntity<ItemResponse> createItem(
-            @RequestBody ItemCreateRequest request
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<SuccessResponseDto> createItem(
+            @Valid @RequestBody ItemCreateRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.createItem(request));
+        return ResponseEntity.ok(SuccessResponseDto.builder()
+                .code(ResponseCode.S)
+                .message("상품 등록 성공")
+                .data(itemService.createItem(request))
+                .build());
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<ItemResponse> updateItem(
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<SuccessResponseDto> updateItem(
             @PathVariable UUID id,
-            @RequestBody ItemUpdateRequest request
+            @Valid @RequestBody ItemUpdateRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.updateItem(id, request));
+        return ResponseEntity.ok(SuccessResponseDto.builder()
+                .code(ResponseCode.S)
+                .message("상품 수정 성공")
+                .data(itemService.updateItem(id, request))
+                .build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteItem(@PathVariable UUID id) {
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<SuccessResponseDto> deleteItem(@PathVariable UUID id) {
         itemService.deleteItem(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok(SuccessResponseDto.builder()
+                .code(ResponseCode.S)
+                .message("상품 삭제 성공")
+                .build());
     }
 }

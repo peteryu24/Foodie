@@ -10,8 +10,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@Builder
 public class ItemResponse {
     private final UUID          id;
+    private final UUID          storeId;
     private final String        name;
     private final BigDecimal    price;
     private final String        description;
@@ -21,22 +23,18 @@ public class ItemResponse {
     private final LocalDateTime updatedAt;
     private final Long          updatedBy;
 
-    @Builder
-    private ItemResponse(Item item) {
-        this.id = item.getId();
-        this.name = item.getName();
-        this.price = item.getPrice();
-        this.description = item.getDescription();
-        this.status = item.getStatus();
-        this.createdAt = item.getCreatedAt();
-        this.createdBy = item.getCreatedBy();
-        this.updatedAt = item.getUpdatedAt();
-        this.updatedBy = item.getUpdatedBy();
-    }
-
-    public static ItemResponse of(Item item) {
+    public static ItemResponse from(Item item) {
         return ItemResponse.builder()
-                .item(item)
+                .id(item.getId())
+                .storeId(item.getStore().getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .description(item.getDescription())
+                .status(item.getStatus())
+                .createdAt(item.getCreatedAt())
+                .createdBy(item.getCreatedBy())
+                .updatedAt(item.getUpdatedAt())
+                .updatedBy(item.getUpdatedBy())
                 .build();
     }
 }

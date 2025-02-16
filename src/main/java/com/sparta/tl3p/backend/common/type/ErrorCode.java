@@ -10,10 +10,12 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("M-003", "Member Role Not Found"),
 
     // Store
+    STORE_NOT_FOUND("S-001", "Store Not Found"),
 
     // Review
 
     // Item
+    ITEM_NOT_FOUND("I-001", "Item Not Found"),
 
     // Order
 
