@@ -1,6 +1,6 @@
 package com.sparta.tl3p.backend.domain.store.entity;
 
-import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
+import com.sparta.tl3p.backend.common.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @Table(name = "p_store_category")
-public class StoreCategory {
+public class StoreCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,11 +22,10 @@ public class StoreCategory {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category_id", nullable = false)
-    private CategoryType categoryId;  // 🔥 ENUM으로 변경
+    @Column(name = "category_id", length = 20, nullable = false)
+    private String categoryId;
 
-    public StoreCategory(Store store, CategoryType categoryId) {
+    public StoreCategory(Store store, String categoryId) {
         this.store = store;
         this.categoryId = categoryId;
     }

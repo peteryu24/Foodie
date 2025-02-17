@@ -1,22 +1,20 @@
 package com.sparta.tl3p.backend.domain.store.entity;
 
+import com.sparta.tl3p.backend.common.audit.BaseEntity;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
+import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
-import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_store")
-public class Store {
+public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,41 +38,25 @@ public class Store {
     @JoinColumn(name = "user_id", nullable = false)
     private Member owner;
 
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private Long deletedBy;
-
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreCategory> storeCategories = new HashSet<>();
 
     @Builder
-    public Store(String name, String content, String address, Member owner, Long createdBy) {
+    public Store(String name, String content, String address, Member owner) {
         this.name = name;
         this.content = content;
         this.address = address;
         this.owner = owner;
-        this.createdBy = createdBy;
     }
 
-    public void addCategory(StoreCategory category) {
-        this.storeCategories.add(category);
+    public void updateStore(String name, String content, String address, StoreStatus status) {
+        this.name = name;
+        this.content = content;
+        this.address = address;
+        this.status = status;
     }
 
-    public void removeCategory(StoreCategory category) {
-        this.storeCategories.remove(category);
+    public void hideStore() {
+        this.status = StoreStatus.DELETED;
     }
 }
