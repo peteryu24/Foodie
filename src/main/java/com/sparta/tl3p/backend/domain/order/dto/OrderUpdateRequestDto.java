@@ -9,5 +9,5 @@ import java.util.List;
 @Builder
 public class OrderUpdateRequestDto {
     private List<OrderItemDto> items;
-    private String store_request;
+    private String storeRequest;
 }
