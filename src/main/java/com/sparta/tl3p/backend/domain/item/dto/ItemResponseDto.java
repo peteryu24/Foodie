@@ -1,40 +1,38 @@
 package com.sparta.tl3p.backend.domain.item.dto;
 
 import com.sparta.tl3p.backend.domain.item.entity.Item;
-import com.sparta.tl3p.backend.domain.item.entity.ItemStatus;
+import com.sparta.tl3p.backend.domain.item.enums.ItemStatus;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
 @Builder
-public class ItemResponse {
+public class ItemResponseDto {
     private final UUID          id;
     private final UUID          storeId;
-    private final String        name;
-    private final BigDecimal    price;
+    private final String        storeName;
+    private final String        itemName;
     private final String        description;
+    private final BigDecimal    price;
     private final ItemStatus    status;
     private final LocalDateTime createdAt;
-    private final Long          createdBy;
     private final LocalDateTime updatedAt;
-    private final Long          updatedBy;
 
-    public static ItemResponse from(Item item) {
-        return ItemResponse.builder()
+    public static ItemResponseDto from(Item item) {
+        return ItemResponseDto.builder()
                 .id(item.getId())
                 .storeId(item.getStore().getId())
-                .name(item.getName())
-                .price(item.getPrice())
+                .storeName(item.getStore().getName())
+                .itemName(item.getName())
                 .description(item.getDescription())
+                .price(item.getPrice())
                 .status(item.getStatus())
                 .createdAt(item.getCreatedAt())
-                .createdBy(item.getCreatedBy())
                 .updatedAt(item.getUpdatedAt())
-                .updatedBy(item.getUpdatedBy())
                 .build();
     }
 }

@@ -2,12 +2,12 @@ package com.sparta.tl3p.backend.domain.item.controller;
 
 import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
 import com.sparta.tl3p.backend.common.type.ResponseCode;
-import com.sparta.tl3p.backend.domain.item.dto.ItemCreateRequest;
-import com.sparta.tl3p.backend.domain.item.dto.ItemUpdateRequest;
+import com.sparta.tl3p.backend.domain.item.dto.*;
 import com.sparta.tl3p.backend.domain.item.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +21,17 @@ import java.util.UUID;
 public class ItemController {
     private final ItemService itemService;
 
-    //    @GetMapping
-    //    public ResponseEntity<SuccessResponseDto> searchItems(
-    //            @Valid ItemSearchRequest request
-    //    ) {
-    //        return ResponseEntity.ok(SuccessResponseDto.builder()
-    //                .code(ResponseCode.S)
-    //                .message("상품 목록 조회 성공")
-    //                .data(itemService.searchItems(request))
-    //                .build());
-    //    }
+    @GetMapping
+    public ResponseEntity<SuccessResponseDto> getAllItems(
+            @ModelAttribute @Valid ItemSearchRequestDto request
+    ) {
+        Page<ItemResponseDto> result = itemService.getAllItems(request).map(ItemResponseDto::from);
+        return ResponseEntity.ok(SuccessResponseDto.builder()
+                .code(ResponseCode.S)
+                .message("상품 목록 조회 성공")
+                .data(ItemPageResponseDto.of(result))
+                .build());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<SuccessResponseDto> getItem(@PathVariable UUID id) {
@@ -44,7 +45,7 @@ public class ItemController {
     @PostMapping
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<SuccessResponseDto> createItem(
-            @Valid @RequestBody ItemCreateRequest request
+            @Valid @RequestBody ItemCreateRequestDto request
     ) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
@@ -57,7 +58,7 @@ public class ItemController {
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<SuccessResponseDto> updateItem(
             @PathVariable UUID id,
-            @Valid @RequestBody ItemUpdateRequest request
+            @Valid @RequestBody ItemUpdateRequestDto request
     ) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
@@ -73,6 +74,16 @@ public class ItemController {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 삭제 성공")
+                .build());
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<SuccessResponseDto> hideItem(@PathVariable UUID id) {
+        return ResponseEntity.ok(SuccessResponseDto.builder()
+                .code(ResponseCode.S)
+                .message("상품 숨김 성공")
+                .data(itemService.hideItem(id))
                 .build());
     }
 }

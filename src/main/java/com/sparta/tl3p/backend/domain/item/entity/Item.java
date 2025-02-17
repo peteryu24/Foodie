@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.item.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.domain.item.enums.ItemStatus;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

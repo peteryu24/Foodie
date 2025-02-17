@@ -2,21 +2,21 @@ package com.sparta.tl3p.backend.domain.item.service;
 
 import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ErrorCode;
-import com.sparta.tl3p.backend.domain.item.dto.ItemCreateRequest;
-import com.sparta.tl3p.backend.domain.item.dto.ItemResponse;
-import com.sparta.tl3p.backend.domain.item.dto.ItemUpdateRequest;
+import com.sparta.tl3p.backend.domain.item.dto.ItemCreateRequestDto;
+import com.sparta.tl3p.backend.domain.item.dto.ItemResponseDto;
+import com.sparta.tl3p.backend.domain.item.dto.ItemSearchRequestDto;
+import com.sparta.tl3p.backend.domain.item.dto.ItemUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.item.entity.Item;
 import com.sparta.tl3p.backend.domain.item.repository.ItemRepository;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import com.sparta.tl3p.backend.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,45 +26,40 @@ public class ItemService {
     private final ItemRepository  itemRepository;
     private final StoreRepository storeRepository;
 
-    public ItemResponse getItem(UUID itemId) {
-        return ItemResponse.from(
+    public ItemResponseDto getItem(UUID itemId) {
+        return ItemResponseDto.from(
                 itemRepository.findById(itemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND))
         );
     }
 
-    //    public Page<ItemResponse> searchItems(ItemSearchRequest request) {
-    //        return itemRepository.search(request)
-    //                .map(ItemResponse::from);
-    //    }
-
     @Transactional
-    public ItemResponse createItem(ItemCreateRequest request) {
+    public ItemResponseDto createItem(ItemCreateRequestDto request) {
 
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         Item item = Item.builder()
                 .store(store)
-                .name(request.getName())
+                .name(request.getItemName())
                 .price(request.getPrice())
                 .description(request.getDescription())
                 .build();
 
-        return ItemResponse.from(itemRepository.save(item));
+        return ItemResponseDto.from(itemRepository.save(item));
     }
 
     @Transactional
-    public ItemResponse updateItem(UUID id, ItemUpdateRequest request) {
+    public ItemResponseDto updateItem(UUID id, ItemUpdateRequestDto request) {
         Item item = findItemById(id);
 
-        item.updateItem(request.getName(),
+        item.updateItem(request.getItemName(),
                 request.getPrice(),
                 request.getDescription(),
-                request.getItemStatus()
+                request.getStatus()
         );
 
-        return ItemResponse.from(item);
+        return ItemResponseDto.from(item);
     }
 
 
@@ -81,11 +76,15 @@ public class ItemService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
     }
 
-    @Transactional(readOnly = true)
-    public List<ItemResponse> getItems() {
-        return itemRepository.findAll().stream()
-                .map(ItemResponse::from)
-                .collect(Collectors.toList());
+    public Page<Item> getAllItems(ItemSearchRequestDto request) {
+        return itemRepository.findAllWithStore(request);
     }
 
+    @Transactional
+    public ItemResponseDto hideItem(UUID id) {
+        Item item = findItemById(id);
+        item.hideItem();
+
+        return ItemResponseDto.from(item);
+    }
 }

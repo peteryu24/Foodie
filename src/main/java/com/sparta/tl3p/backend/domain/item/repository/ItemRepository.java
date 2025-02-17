@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, UUID> {
-    //    Page<Item> search(ItemSearchRequest request);
+public interface ItemRepository extends JpaRepository<Item, UUID>, ItemQueryRepository {
+
 }
