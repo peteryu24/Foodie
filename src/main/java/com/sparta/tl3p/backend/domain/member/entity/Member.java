@@ -1,5 +1,7 @@
 package com.sparta.tl3p.backend.domain.member.entity;
 
+import com.sparta.tl3p.backend.domain.member.enums.MemberStatus;
+import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
@@ -15,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "member")
+@Table(name = "p_member")
 public class Member {
 
     @Id
@@ -34,7 +36,6 @@ public class Member {
     private String address;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
 
     @Column(updatable = false)
@@ -47,7 +48,7 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Store> stores = new ArrayList<>();
 
 }
