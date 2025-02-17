@@ -11,11 +11,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderCreateRequestDto {
+public class OrderRequestDto {
+    private Long memberId;                   // FK: p_order.member_id
+    private UUID storeId;                  // FK: p_order.store_id
     private OrderType orderType;           // ONLINE, IN_STORE
     private PaymentMethod paymentMethod;   // CARD
     private String deliveryAddress;
     private String storeRequest;
-    private UUID storeId;                  // FK: p_order.store_id
-    private Long userId;                   // FK: p_order.user_id
+
 }
