@@ -2,7 +2,6 @@ package com.sparta.tl3p.backend.domain.review.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
-import com.sparta.tl3p.backend.domain.review.dto.ReviewCreationRequestDto;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,11 +28,11 @@ public class Review extends BaseEntity {
     private ReviewStatus status = ReviewStatus.CREATED;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
+    @JoinColumn(name = "store_id")
     private Store store;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id")
     private Order order;
 
     public void hideReview() {
