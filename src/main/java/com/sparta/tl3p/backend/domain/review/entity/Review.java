@@ -45,12 +45,10 @@ public class Review extends BaseEntity {
         this.status = ReviewStatus.UPDATED;
     }
 
-    public void createReview(ReviewCreationRequestDto requestDto) {
-        this.score = requestDto.getScore();
-        this.content = requestDto.getContent();
-
-//        Order order = orderRepository.findById(requestDto.getOrderId());
-//        this.order = order;
-//        this.store = order.getStore();
+    public void createReview(String content, Double score, Order order) {
+        this.content = content;
+        this.score = score;
+        this.order = order;
+        this.store = order.getStore();
     }
 }
