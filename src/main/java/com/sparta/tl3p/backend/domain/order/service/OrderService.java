@@ -73,6 +73,7 @@ public class OrderService {
 //        productMap.put(prod2, new ItemInfo("상품명2", BigDecimal.valueOf(20000)));
 //        productMap.put(prod3, new ItemInfo("상품명3", BigDecimal.valueOf(15000)));
 //    }
+//
 
     // 주문 생성 – 엔티티의 factory 메소드 활용 후 OrderResponseDto로 반환
     public OrderResponseDto createOrder(OrderRequestDto dto) {
