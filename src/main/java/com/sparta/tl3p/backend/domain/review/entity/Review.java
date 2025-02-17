@@ -35,7 +35,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    private void updateStatus(ReviewStatus reviewStatus) {
-        this.status = reviewStatus;
+    public void hideReview() {
+        this.status = ReviewStatus.DELETED;
     }
 }
