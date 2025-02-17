@@ -12,7 +12,7 @@ public enum ErrorCode {
     // Store
 
     // Review
-
+    REVIEW_NOT_FOUND("R-001", "Review Not Found"),
     // Item
 
     // Order
