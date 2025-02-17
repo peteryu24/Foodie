@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.order.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.domain.item.entity.Item;
 import jakarta.persistence.*;
 import lombok.*;
 
