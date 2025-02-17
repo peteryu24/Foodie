@@ -27,37 +27,36 @@ public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "order_id")
     private UUID orderId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_type", nullable = false)
+    @Column(name = "order_type")
     private OrderType orderType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", nullable = false)
+    @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
-    @Column(name = "delivery_address", nullable = false)
+    @Column(name = "delivery_address")
     private String deliveryAddress;
 
     @Column(name = "store_request")
     private String storeRequest;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private DataStatus status;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
+    @JoinColumn(name = "store_id")
     private Store store;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Member_id", nullable = false)
-    private Member Member;
+    @JoinColumn(name = "Member_id")
+    private Member member;
 
     /** 1:N 주문상품 */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
