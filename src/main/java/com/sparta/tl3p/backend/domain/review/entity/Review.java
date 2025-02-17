@@ -18,7 +18,7 @@ public class Review extends BaseEntity {
     private Long reviewId;
 
     @Column(nullable = false)
-    private double score;
+    private Double score;
 
     @Column(nullable = false)
     private String content;
