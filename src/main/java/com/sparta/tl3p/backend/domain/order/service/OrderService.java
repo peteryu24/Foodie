@@ -35,44 +35,44 @@ public class OrderService {
         }
     }
 
-    public OrderService() {
-        // 회원 mock 데이터
-        Member member1 = new Member();
-        member1.setMemberId(1L);
-        member1.setUsername("hong");
-        memberMap.put(1L, member1);
-
-        Member member2 = new Member();
-        member2.setMemberId(2L);
-        member2.setUsername("kim");
-        memberMap.put(2L, member2);
-
-        // 가게 mock 데이터 (Store 엔티티의 builder 사용)
-        Store store1 = Store.builder()
-                .name("Store1")
-                .content("Content1")
-                .address("서울시 강남구")
-                .owner(member1)
-                .build();
-        Store store2 = Store.builder()
-                .name("Store2")
-                .content("Content2")
-                .address("서울시 종로구")
-                .owner(member2)
-                .build();
-        storeMap.put(store1.getId(), store1);
-        storeMap.put(store2.getId(), store2);
-        System.out.println("Store1 UUID: " + store1.getId());
-        System.out.println("Store2 UUID: " + store2.getId());
-
-        // 상품 mock 데이터 (고정 UUID 사용)
-        UUID prod1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
-        UUID prod2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
-        UUID prod3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
-        productMap.put(prod1, new ItemInfo("상품명1", BigDecimal.valueOf(10000)));
-        productMap.put(prod2, new ItemInfo("상품명2", BigDecimal.valueOf(20000)));
-        productMap.put(prod3, new ItemInfo("상품명3", BigDecimal.valueOf(15000)));
-    }
+//    public OrderService() {
+//        // 회원 mock 데이터
+//        Member member1 = new Member();
+//        member1.setMemberId(1L);
+//        member1.setUsername("hong");
+//        memberMap.put(1L, member1);
+//
+//        Member member2 = new Member();
+//        member2.setMemberId(2L);
+//        member2.setUsername("kim");
+//        memberMap.put(2L, member2);
+//
+//        // 가게 mock 데이터 (Store 엔티티의 builder 사용)
+//        Store store1 = Store.builder()
+//                .name("Store1")
+//                .content("Content1")
+//                .address("서울시 강남구")
+//                .owner(member1)
+//                .build();
+//        Store store2 = Store.builder()
+//                .name("Store2")
+//                .content("Content2")
+//                .address("서울시 종로구")
+//                .owner(member2)
+//                .build();
+//        storeMap.put(store1.getId(), store1);
+//        storeMap.put(store2.getId(), store2);
+//        System.out.println("Store1 UUID: " + store1.getId());
+//        System.out.println("Store2 UUID: " + store2.getId());
+//
+//        // 상품 mock 데이터 (고정 UUID 사용)
+//        UUID prod1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+//        UUID prod2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+//        UUID prod3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
+//        productMap.put(prod1, new ItemInfo("상품명1", BigDecimal.valueOf(10000)));
+//        productMap.put(prod2, new ItemInfo("상품명2", BigDecimal.valueOf(20000)));
+//        productMap.put(prod3, new ItemInfo("상품명3", BigDecimal.valueOf(15000)));
+//    }
 
     // 주문 생성 – 엔티티의 factory 메소드 활용 후 OrderResponseDto로 반환
     public OrderResponseDto createOrder(OrderRequestDto dto) {
