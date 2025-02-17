@@ -45,4 +45,8 @@ public class BaseEntity {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = deleteUserId;
     }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
 }
