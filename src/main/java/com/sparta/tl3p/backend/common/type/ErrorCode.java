@@ -14,7 +14,7 @@ public enum ErrorCode {
     // Review
     REVIEW_NOT_FOUND("R-001", "Review Not Found"),
     // Item
-
+    ITEM_NOT_FOUND("I-001", "Item Not Found"),
     // Order
 
     // Payment
