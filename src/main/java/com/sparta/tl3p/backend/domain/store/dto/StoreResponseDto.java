@@ -19,6 +19,7 @@ public class StoreResponseDto {
     private StoreStatus status;
     private Long ownerId;
     private List<String> categoryIds;
+    private double avgScore;
 
     public StoreResponseDto(Store store) {
         this.id = store.getId();
@@ -30,5 +31,10 @@ public class StoreResponseDto {
         this.categoryIds = store.getStoreCategories().stream()
                 .map(StoreCategory::getCategoryId)
                 .collect(Collectors.toList());
+        this.avgScore = avgScore;
+    }
+    public StoreResponseDto(Store store, double avgScore) {
+        this(store);
+        this.avgScore = avgScore;
     }
 }
