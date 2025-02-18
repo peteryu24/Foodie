@@ -63,8 +63,8 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}")
-    public ResponseEntity<SuccessResponseDto> searchReview(@PathVariable UUID reviewId) {
-        ReviewResponseDto responseDto = reviewService.searchReview(reviewId);
+    public ResponseEntity<SuccessResponseDto> findReview(@PathVariable UUID reviewId) {
+        ReviewResponseDto responseDto = reviewService.findReview(reviewId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.NS)
