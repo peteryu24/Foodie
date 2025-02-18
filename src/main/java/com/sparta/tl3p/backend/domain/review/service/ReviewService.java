@@ -38,9 +38,9 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponseDto> searchReviews(UUID storeId, String product) {
-        // todo: QueryDSL 적용 및 비즈니스 로직 구현
-        return null;
+    public List<ReviewResponseDto> searchReviews(UUID storeId, String query) {
+        List<Review> reviews = reviewRepository.searchReviews(storeId, query);
+        return reviews.stream().map(ReviewResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
