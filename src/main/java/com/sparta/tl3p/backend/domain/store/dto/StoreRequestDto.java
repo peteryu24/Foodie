@@ -5,12 +5,14 @@ import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class StoreRequestDto {
 
     @NotBlank(message = "가게 이름은 필수입니다.")

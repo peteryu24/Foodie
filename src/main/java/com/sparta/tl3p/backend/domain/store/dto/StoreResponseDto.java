@@ -5,6 +5,7 @@ import com.sparta.tl3p.backend.domain.store.entity.Store;
 import com.sparta.tl3p.backend.domain.store.entity.StoreCategory;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class StoreResponseDto {
 
     private UUID id;
@@ -23,9 +25,6 @@ public class StoreResponseDto {
     private Long memberId;
     private List<String> categoryIds;
     private double avgScore;
-
-    public StoreResponseDto() {
-    }
 
     public StoreResponseDto(Store store) {
         this.id = store.getStoreId();
