@@ -33,7 +33,9 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<SuccessResponseDto> updateReview(@PathVariable UUID reviewId, @RequestBody ReviewUpdateRequestDto requestDto) {
+    public ResponseEntity<SuccessResponseDto> updateReview(
+            @PathVariable UUID reviewId,
+            @RequestBody ReviewUpdateRequestDto requestDto) {
         reviewService.updateReview(reviewId, requestDto.getContent(), requestDto.getScore());
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -89,7 +91,7 @@ public class ReviewController {
         reviewService.deleteReview(reviewId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
-                        .code(ResponseCode.S)
+                        .code(ResponseCode.NS)
                         .message("리뷰가 영구적으로 삭제되었습니다.")
                         .data(null)
                         .build()
