@@ -21,21 +21,21 @@ public class Store extends BaseEntity {
     @Column(name = "store_id", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(name = "name", length = 20, nullable = false, unique = true)
+    @Column(name = "name", length = 20, unique = true) // nullable = false 임시제거
     private String name;
 
     @Column(name = "content", length = 200)
     private String content;
 
-    @Column(name = "address", length = 255, nullable = false)
+    @Column(name = "address", length = 255) // nullable = false 임시제거
     private String address;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status") // nullable = false 임시제거
     private StoreStatus status = StoreStatus.CREATED;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id") // nullable = false 임시제거
     private Member owner;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
