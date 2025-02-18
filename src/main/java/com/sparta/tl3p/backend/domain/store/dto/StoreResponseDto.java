@@ -22,6 +22,9 @@ public class StoreResponseDto {
     private List<String> categoryIds;
     private double avgScore;
 
+    public StoreResponseDto() {
+    }
+
     public StoreResponseDto(Store store) {
         this.id = store.getStoreId();
         this.name = store.getName();
