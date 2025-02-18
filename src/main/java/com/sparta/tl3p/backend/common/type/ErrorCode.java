@@ -8,6 +8,7 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND("M-001", "Member Not Found"),
     EMAIL_NOT_FOUND("M-002", "Member Email Not Found"),
     ROLE_NOT_FOUND("M-003", "Member Role Not Found"),
+    USERNAME_DUPLICATE("M-004", "Username already exists"),
 
     // Store
     STORE_NOT_FOUND("S-001", "Store Not Found"),
