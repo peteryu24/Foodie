@@ -20,7 +20,7 @@ public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "store_id", columnDefinition = "uuid")
-    private UUID id;
+    private UUID storeId;
 
     @Column(name = "name", length = 20, unique = true) // nullable = false 임시제거
     private String name;
