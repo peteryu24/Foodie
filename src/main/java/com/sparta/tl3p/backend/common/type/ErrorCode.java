@@ -16,7 +16,7 @@ public enum ErrorCode {
     // Item
     ITEM_NOT_FOUND("I-001", "Item Not Found"),
     // Order
-
+    ORDER_NOT_FOUND("O-001", "Order Not Found"),
     // Payment
 
     // Valid
