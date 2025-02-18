@@ -43,45 +43,43 @@ public class OrderService {
         }
     }
 
-    // 기본 생성자에서 모의 데이터 초기화
-    public OrderService() {
-        // 회원 mock 데이터
-        Member member1 = new Member();
-        member1.setMemberId(1L);
-        member1.setUsername("hong");
-        memberMap.put(1L, member1);
-
-        Member member2 = new Member();
-        member2.setMemberId(2L);
-        member2.setUsername("kim");
-        memberMap.put(2L, member2);
-
-        // 가게 mock 데이터 (Store 엔티티의 Builder 사용)
-        Store store1 = Store.builder()
-                .name("Store1")
-                .content("Content1")
-                .address("서울시 강남구")
-                .member(member1)
-                .build();
-        Store store2 = Store.builder()
-                .name("Store2")
-                .content("Content2")
-                .address("서울시 종로구")
-                .member(member2)
-                .build();
-        storeMap.put(store1.getId(), store1);
-        storeMap.put(store2.getId(), store2);
-        System.out.println("Store1 UUID: " + store1.getId());
-        System.out.println("Store2 UUID: " + store2.getId());
-
-        // 상품 mock 데이터 (고정 UUID 사용)
-        UUID prod1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
-        UUID prod2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
-        UUID prod3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
-        productMap.put(prod1, new ItemInfo("상품명1", BigDecimal.valueOf(10000)));
-        productMap.put(prod2, new ItemInfo("상품명2", BigDecimal.valueOf(20000)));
-        productMap.put(prod3, new ItemInfo("상품명3", BigDecimal.valueOf(15000)));
-    }
+//    // 기본 생성자에서 모의 데이터 초기화
+//    public OrderService() {
+//        // 회원 mock 데이터
+//        Member member1 = new Member();
+//        member1.setMemberId(1L);
+//        member1.setUsername("hong");
+//        memberMap.put(1L, member1);
+//
+//        Member member2 = new Member();
+//        member2.setMemberId(2L);
+//        member2.setUsername("kim");
+//        memberMap.put(2L, member2);
+//
+//        // 가게 mock 데이터 (Store 엔티티의 Builder 사용)
+//        Store store1 = Store.builder()
+//                .name("Store1")
+//                .content("Content1")
+//                .member(member1)
+//                .build();
+//        Store store2 = Store.builder()
+//                .name("Store2")
+//                .content("Content2")
+//                .member(member2)
+//                .build();
+//        storeMap.put(store1.getStoreId(), store1);
+//        storeMap.put(store2.getStoreId(), store2);
+//        System.out.println("Store1 UUID: " + store1.getStoreId());
+//        System.out.println("Store2 UUID: " + store2.getStoreId());
+//
+//        // 상품 mock 데이터 (고정 UUID 사용)
+//        UUID prod1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+//        UUID prod2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+//        UUID prod3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
+//        productMap.put(prod1, new ItemInfo("상품명1", BigDecimal.valueOf(10000)));
+//        productMap.put(prod2, new ItemInfo("상품명2", BigDecimal.valueOf(20000)));
+//        productMap.put(prod3, new ItemInfo("상품명3", BigDecimal.valueOf(15000)));
+//    }
 
     @Transactional
     public OrderResponseDto createOrder(OrderRequestDto dto) {
@@ -140,7 +138,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getStoreOrders(UUID storeId) {
         return orderStore.values().stream()
-                .filter(o -> o.getStore().getId().equals(storeId))
+                .filter(o -> o.getStore().getStoreId().equals(storeId))
                 .map(OrderResponseDto::new)
                 .collect(Collectors.toList());
     }
