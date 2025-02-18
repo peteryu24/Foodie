@@ -3,7 +3,6 @@ package com.sparta.tl3p.backend.domain.member.entity;
 import com.sparta.tl3p.backend.domain.member.enums.MemberStatus;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
-import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,11 +43,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status = MemberStatus.CREATED;
 
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
-
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Store> stores = new ArrayList<>();
 
 }
