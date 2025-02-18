@@ -1,9 +1,7 @@
 package com.sparta.tl3p.backend.domain.member.dto;
 
 import com.sparta.tl3p.backend.domain.member.enums.Role;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
