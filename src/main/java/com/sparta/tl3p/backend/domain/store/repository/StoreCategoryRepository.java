@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface StoreCategoryRepository extends JpaRepository<StoreCategory, UUID> {
-    List<StoreCategory> findByStoreId(UUID storeId);
+    List<StoreCategory> findByStoreStoreId(UUID storeId);
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM StoreCategory sc WHERE sc.store.id = :storeId")
+    @Query("DELETE FROM StoreCategory sc WHERE sc.store.storeId = :storeId")
     void deleteByStoreId(UUID storeId);
 }
