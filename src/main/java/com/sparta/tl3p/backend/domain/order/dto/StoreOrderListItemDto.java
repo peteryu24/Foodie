@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.order.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.order.enums.OrderType;
 import com.sparta.tl3p.backend.domain.order.enums.PaymentMethod;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
@@ -14,7 +15,7 @@ public class StoreOrderListItemDto {
     private String memberId;
     private OrderType orderType;
     private PaymentMethod paymentMethod;
-    private String deliveryAddress;
+    private Address deliveryAddress;
     private String storeRequest;
     private String createdAt;
 

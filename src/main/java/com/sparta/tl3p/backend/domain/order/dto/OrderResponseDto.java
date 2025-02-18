@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.order.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
 import com.sparta.tl3p.backend.domain.order.enums.DataStatus;
 import com.sparta.tl3p.backend.domain.order.enums.OrderType;
@@ -16,7 +17,7 @@ public class OrderResponseDto {
     private UUID orderId;
     private OrderType orderType;
     private PaymentMethod paymentMethod;
-    private String deliveryAddress;
+    private Address deliveryAddress;
     private String storeRequest;
     private DataStatus status;
     private LocalDateTime createdAt;
@@ -32,7 +33,7 @@ public class OrderResponseDto {
         this.storeRequest = order.getStoreRequest();
         this.status = order.getStatus();
         this.createdAt = order.getCreatedAt();
-        this.storeId = order.getStore().getId();
+        this.storeId = order.getStore().getStoreId();
         this.userId = order.getMember().getMemberId();
     }
 }

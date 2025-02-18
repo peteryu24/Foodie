@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.order.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class OrderDetailResponseDto {
     private String storeId;
     private Object orderType;
     private Object paymentMethod;
-    private String deliveryAddress;
+    private Address deliveryAddress;
     private String storeRequest;
     private List<OrderDetailItemDto> items;
     private String createdAt;
@@ -24,7 +25,7 @@ public class OrderDetailResponseDto {
     public OrderDetailResponseDto(Order order) {
         this.orderId = order.getOrderId().toString();
         this.memberId = order.getMember().getMemberId().toString();
-        this.storeId = order.getStore().getId().toString();
+        this.storeId = order.getStore().getStoreId().toString();
         this.orderType = order.getOrderType();
         this.paymentMethod = order.getPaymentMethod();
         this.deliveryAddress = order.getDeliveryAddress();

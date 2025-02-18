@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.order.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto;
 import com.sparta.tl3p.backend.domain.order.enums.DataStatus;
 import com.sparta.tl3p.backend.domain.order.enums.OrderType;
@@ -39,8 +40,9 @@ public class Order extends BaseEntity {
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
+    @Embedded
     @Column(name = "delivery_address")
-    private String deliveryAddress;
+    private Address deliveryAddress;
 
     @Column(name = "store_request")
     private String storeRequest;
@@ -68,7 +70,7 @@ public class Order extends BaseEntity {
     private Review review;
 
     // Factory 메소드로 주문 생성 (DTO, 회원, 가게를 받아 처리)
-    public static Order createOrder(com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto dto, Member member, Store store, List<OrderItem> orderItems) {
+    public static Order createOrder(OrderRequestDto dto, Member member, Store store, List<OrderItem> orderItems) {
         Order order = Order.builder()
                 .orderId(UUID.randomUUID())
                 .orderType(dto.getOrderType())

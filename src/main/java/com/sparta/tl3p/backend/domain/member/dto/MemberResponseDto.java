@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.member.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.enums.MemberStatus;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
@@ -19,7 +20,7 @@ public class MemberResponseDto {
     private String username;
     private String email;
     private String nickname;
-    private String address;
+    private Address address;
     private Role role;
     private MemberStatus status;
     private LocalDateTime joinDate;

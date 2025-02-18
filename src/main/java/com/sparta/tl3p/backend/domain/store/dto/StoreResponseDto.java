@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.store.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import com.sparta.tl3p.backend.domain.store.entity.StoreCategory;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
@@ -15,14 +16,14 @@ public class StoreResponseDto {
     private UUID id;
     private String name;
     private String content;
-    private String address;
+    private Address address;
     private StoreStatus status;
     private Long memberId;
     private List<String> categoryIds;
     private double avgScore;
 
     public StoreResponseDto(Store store) {
-        this.id = store.getId();
+        this.id = store.getStoreId();
         this.name = store.getName();
         this.content = store.getContent();
         this.address = store.getAddress();

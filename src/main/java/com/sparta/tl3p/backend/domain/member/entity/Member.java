@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.member.entity;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.member.enums.MemberStatus;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
@@ -32,7 +33,9 @@ public class Member {
     private String email;
 
     private String nickname;
-    private String address;
+
+    @Embedded
+    private Address address;
 
     @Enumerated(EnumType.STRING)
     private Role role;
