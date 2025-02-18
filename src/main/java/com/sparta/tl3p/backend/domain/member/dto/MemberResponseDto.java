@@ -1,8 +1,9 @@
 package com.sparta.tl3p.backend.domain.member.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
-import com.sparta.tl3p.backend.domain.member.entity.MemberStatus;
-import com.sparta.tl3p.backend.domain.member.entity.Role;
+import com.sparta.tl3p.backend.domain.member.enums.MemberStatus;
+import com.sparta.tl3p.backend.domain.member.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,17 +15,17 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberDTO {
+public class MemberResponseDto {
     private Long memberId;
     private String username;
     private String email;
     private String nickname;
-    private String address;
+    private Address address;
     private Role role;
     private MemberStatus status;
     private LocalDateTime joinDate;
 
-    public MemberDTO(Member member){
+    public MemberResponseDto(Member member){
         this.memberId = member.getMemberId();
         this.username = member.getUsername();
         this.email = member.getEmail();

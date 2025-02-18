@@ -1,13 +1,11 @@
 package com.sparta.tl3p.backend.domain.store.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,41 +20,45 @@ public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "store_id", columnDefinition = "uuid")
-    private UUID id;
+    private UUID storeId;
 
-    @Column(name = "name", length = 20, nullable = false, unique = true)
+    @Column(name = "name", length = 20, unique = true) // nullable = false 임시제거
     private String name;
 
     @Column(name = "content", length = 200)
     private String content;
 
-    @Column(name = "address", length = 255, nullable = false)
-    private String address;
+    @Embedded
+    @Column(name = "address") // nullable = false 임시제거
+    private Address address;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status") // nullable = false 임시제거
     private StoreStatus status = StoreStatus.CREATED;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "user_id") // nullable = false 임시제거
     private Member member;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreCategory> storeCategories = new HashSet<>();
 
     @Builder
-    public Store(String name, String content, String address, Member member) {
+    public Store(String name, String content, Address address, Member member) {
         this.name = name;
         this.content = content;
         this.address = address;
         this.member = member;
     }
 
-    public void addCategory(StoreCategory category) {
-        this.storeCategories.add(category);
+    public void updateStore(String name, String content, Address address, StoreStatus status) {
+        this.name = name;
+        this.content = content;
+        this.address = address;
+        this.status = status;
     }
 
-    public void removeCategory(StoreCategory category) {
-        this.storeCategories.remove(category);
+    public void hideStore() {
+        this.status = StoreStatus.DELETED;
     }
 }

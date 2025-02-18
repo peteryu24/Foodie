@@ -27,7 +27,7 @@ public class ItemSearchRequestDto {
     private ItemSortOption sortOption = ItemSortOption.CREATED_AT_DESC;
 
     public int getPage() {
-        return (page != null && page > 0) ? page-1 : 0;
+        return (page != null && page > 0) ? page - 1 : 0;
     }
 
     public int getValidatedSize() {

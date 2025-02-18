@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/items/v1")
+@RequestMapping("/api/v1/items")
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
@@ -25,7 +25,7 @@ public class ItemController {
     public ResponseEntity<SuccessResponseDto> getAllItems(
             @ModelAttribute @Valid ItemSearchRequestDto request
     ) {
-        Page<ItemResponseDto> result = itemService.getAllItems(request).map(ItemResponseDto::from);
+        Page<ItemResponseDto> result = itemService.getAllItems(request).map(ItemResponseDto::of);
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 목록 조회 성공")
@@ -33,12 +33,12 @@ public class ItemController {
                 .build());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponseDto> getItem(@PathVariable UUID id) {
+    @GetMapping("/{itemId}")
+    public ResponseEntity<SuccessResponseDto> getItem(@PathVariable UUID itemId) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 상세 조회 성공")
-                .data(itemService.getItem(id))
+                .data(itemService.getItem(itemId))
                 .build());
     }
 
@@ -54,36 +54,36 @@ public class ItemController {
                 .build());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{itemId}")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<SuccessResponseDto> updateItem(
-            @PathVariable UUID id,
+            @PathVariable UUID itemId,
             @Valid @RequestBody ItemUpdateRequestDto request
     ) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 수정 성공")
-                .data(itemService.updateItem(id, request))
+                .data(itemService.updateItem(itemId, request))
                 .build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{itemId}")
     @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<SuccessResponseDto> deleteItem(@PathVariable UUID id) {
-        itemService.deleteItem(id);
+    public ResponseEntity<SuccessResponseDto> deleteItem(@PathVariable UUID itemId) {
+        itemService.deleteItem(itemId);
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 삭제 성공")
                 .build());
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{itemId}")
     @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<SuccessResponseDto> hideItem(@PathVariable UUID id) {
+    public ResponseEntity<SuccessResponseDto> hideItem(@PathVariable UUID itemId) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 숨김 성공")
-                .data(itemService.hideItem(id))
+                .data(itemService.hideItem(itemId))
                 .build());
     }
 }
