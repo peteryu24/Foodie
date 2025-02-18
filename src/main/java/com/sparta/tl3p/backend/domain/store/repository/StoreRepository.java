@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface StoreRepository extends JpaRepository<Store, UUID> {
 
-    Optional<Store> findByIdAndOwnerId(UUID storeId, Long ownerId);
+    Optional<Store> findByIdAndMemberId(UUID storeId, Long memberId);
 
-    List<Store> findByOwnerId(Long ownerId);
+    List<Store> findByMemberId(Long memberId);
 
     @Query("SELECT s FROM Store s WHERE " +
             "(:category IS NULL OR EXISTS (SELECT sc FROM StoreCategory sc WHERE sc.store = s AND sc.categoryId = :category)) " +

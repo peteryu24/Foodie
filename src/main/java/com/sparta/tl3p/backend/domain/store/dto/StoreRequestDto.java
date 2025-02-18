@@ -22,7 +22,7 @@ public class StoreRequestDto {
     private StoreStatus status;
 
     @NotNull(message = "가게 주인 ID는 필수입니다.")
-    private Long ownerId;
+    private Long memberId;
 
     private List<String> categoryIds;
 }
