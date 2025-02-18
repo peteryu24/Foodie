@@ -36,13 +36,13 @@ public class StoreService {
     }
 
     public List<StoreResponseDto> getStoresByOwner(Long memberId) {
-        List<Store> stores = storeRepository.findByMemberId(memberId);
+        List<Store> stores = storeRepository.findByMemberMemberId(memberId);
         return stores.stream().map(StoreResponseDto::new).collect(Collectors.toList());
     }
 
     @Transactional
     public void updateStore(UUID storeId, StoreRequestDto requestDto, Long memberId) {
-        Store store = storeRepository.findByIdAndMemberId(storeId, memberId)
+        Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         store.updateStore(requestDto.getName(), requestDto.getContent(), requestDto.getAddress(), requestDto.getStatus());
@@ -57,14 +57,14 @@ public class StoreService {
 
     @Transactional
     public void hideStore(UUID storeId, Long memberId) {
-        Store store = storeRepository.findByIdAndMemberId(storeId, memberId)
+        Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         store.hideStore();
     }
 
     @Transactional
     public void deleteStore(UUID storeId, Long memberId) {
-        Store store = storeRepository.findByIdAndMemberId(storeId, memberId)
+        Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         store.softDelete(memberId);
     }

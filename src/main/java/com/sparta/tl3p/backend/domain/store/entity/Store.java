@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.store.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import jakarta.persistence.*;
@@ -19,7 +20,7 @@ public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "store_id", columnDefinition = "uuid")
-    private UUID id;
+    private UUID storeId;
 
     @Column(name = "name", length = 20, unique = true) // nullable = false 임시제거
     private String name;
@@ -27,8 +28,9 @@ public class Store extends BaseEntity {
     @Column(name = "content", length = 200)
     private String content;
 
-    @Column(name = "address", length = 255) // nullable = false 임시제거
-    private String address;
+    @Embedded
+    @Column(name = "address") // nullable = false 임시제거
+    private Address address;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status") // nullable = false 임시제거
@@ -42,14 +44,14 @@ public class Store extends BaseEntity {
     private Set<StoreCategory> storeCategories = new HashSet<>();
 
     @Builder
-    public Store(String name, String content, String address, Member member) {
+    public Store(String name, String content, Address address, Member member) {
         this.name = name;
         this.content = content;
         this.address = address;
         this.member = member;
     }
 
-    public void updateStore(String name, String content, String address, StoreStatus status) {
+    public void updateStore(String name, String content, Address address, StoreStatus status) {
         this.name = name;
         this.content = content;
         this.address = address;

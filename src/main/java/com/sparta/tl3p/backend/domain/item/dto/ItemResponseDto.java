@@ -25,7 +25,7 @@ public class ItemResponseDto {
     public static ItemResponseDto of(Item item) {
         return ItemResponseDto.builder()
                 .id(item.getId())
-                .storeId(item.getStore().getId())
+                .storeId(item.getStore().getStoreId())
                 .storeName(item.getStore().getName())
                 .itemName(item.getName())
                 .description(item.getDescription())

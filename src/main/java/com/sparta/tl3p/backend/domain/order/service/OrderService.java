@@ -159,7 +159,7 @@ public class OrderService {
 
     public List<StoreOrderListItemDto> getStoreOrders(UUID storeId) {
         return orderStore.values().stream()
-                .filter(order -> order.getStore().getId().equals(storeId))
+                .filter(order -> order.getStore().getStoreId().equals(storeId))
                 .map(StoreOrderListItemDto::new)
                 .collect(Collectors.toList());
     }
