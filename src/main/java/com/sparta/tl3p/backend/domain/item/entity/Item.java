@@ -23,7 +23,7 @@ public class Item extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "item_id", columnDefinition = "uuid")
-    private UUID id;
+    private UUID itemId;
 
     @Column(name = "name", length = 100)
     private String name;
