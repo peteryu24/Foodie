@@ -4,10 +4,10 @@ import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
 import com.sparta.tl3p.backend.common.type.ResponseCode;
 import com.sparta.tl3p.backend.domain.order.dto.*;
 import com.sparta.tl3p.backend.domain.order.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
+
+import java.util.HashMap;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +15,7 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -73,17 +74,29 @@ public class OrderController {
         );
     }
 
-    // 회원별 , 가게별  주문조회
+    // 회원별, 가게별 및 검색 (가게 이름, 상품 이름) 주문조회
     @GetMapping
-    public ResponseEntity<SuccessResponseDto> getUserOrders(@RequestParam(required = false) Long memberId,
-                                                            @RequestParam(required = false) UUID storeId) {
-        // memberId와 storeId 모두 전달되지 않은 경우 예외 처리 또는 기본 동작을 정의할 수 있습니다.
-        if (memberId != null) {
+    public ResponseEntity<SuccessResponseDto> getOrders(
+            @RequestParam(required = false) Long memberId,
+            @RequestParam(required = false) UUID storeId,
+            @RequestParam(required = false) String storeName,
+            @RequestParam(required = false) String productName) {
+
+        if (memberId != null && (storeName != null || productName != null)) {
+            var orders = orderService.searchOrders(memberId, storeName, productName);
+            return ResponseEntity.ok(
+                    SuccessResponseDto.builder()
+                            .code(ResponseCode.S)
+                            .message("검색 주문 조회")
+                            .data(orders)
+                            .build()
+            );
+        } else if (memberId != null) {
             var orders = orderService.getUserOrders(memberId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
                             .code(ResponseCode.S)
-                            .message("")
+                            .message("회원 주문 조회")
                             .data(orders)
                             .build()
             );
@@ -92,7 +105,7 @@ public class OrderController {
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
                             .code(ResponseCode.S)
-                            .message("")
+                            .message("가게 주문 조회")
                             .data(orders)
                             .build()
             );

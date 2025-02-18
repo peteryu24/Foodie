@@ -1,13 +1,13 @@
 package com.sparta.tl3p.backend.domain.order.dto;
-import lombok.*;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Setter
 public class OrderUpdateRequestDto {
-    private List<OrderItemDto> items;
     private String storeRequest;
+    private List<OrderItemRequestDto> items;
 }

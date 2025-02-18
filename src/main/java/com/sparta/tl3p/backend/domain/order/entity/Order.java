@@ -1,8 +1,8 @@
 package com.sparta.tl3p.backend.domain.order.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
-import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto;
+import com.sparta.tl3p.backend.domain.order.dto.OrderUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.order.enums.DataStatus;
 import com.sparta.tl3p.backend.domain.order.enums.OrderType;
 import com.sparta.tl3p.backend.domain.order.enums.PaymentMethod;
@@ -40,9 +40,8 @@ public class Order extends BaseEntity {
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
-    @Embedded
     @Column(name = "delivery_address")
-    private Address deliveryAddress;
+    private String deliveryAddress;
 
     @Column(name = "store_request")
     private String storeRequest;
@@ -69,9 +68,9 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review;
 
-    // Factory 메소드로 주문 생성 (DTO, 회원, 가게를 받아 처리)
-    public static Order createOrder(OrderRequestDto dto, Member member, Store store, List<OrderItem> orderItems) {
-        Order order = Order.builder()
+    // 주문 생성 – OrderRequestDto, Member, Store를 이용해 주문 생성
+    public static Order createOrder(OrderRequestDto dto, Member member, Store store) {
+        return Order.builder()
                 .orderId(UUID.randomUUID())
                 .orderType(dto.getOrderType())
                 .paymentMethod(dto.getPaymentMethod())
@@ -81,16 +80,13 @@ public class Order extends BaseEntity {
                 .member(member)
                 .store(store)
                 .build();
-        order.setOrderItems(orderItems);
-        return order;
     }
 
-    // 주문 아이템 전체 재등록 및 요청사항 업데이트
-    public void updateOrderItems(List<OrderItem> newOrderItems, String storeRequest) {
-        this.orderItems.clear();
-        this.orderItems.addAll(newOrderItems);
-        this.storeRequest = storeRequest;
+    // 주문 수정 – storeRequest(및 필요시 주문 아이템 갱신) 처리
+    public void updateOrder(OrderUpdateRequestDto dto) {
+        this.storeRequest = dto.getStoreRequest();
         this.status = DataStatus.UPDATED;
+        // 주문 아이템 업데이트 로직을 추가할 수 있음 (예: 기존 아이템 초기화 후 재등록)
     }
 
     // 주문 취소 처리

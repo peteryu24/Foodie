@@ -2,12 +2,13 @@ package com.sparta.tl3p.backend.domain.order.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
 import com.sparta.tl3p.backend.domain.item.entity.Item;
+import com.sparta.tl3p.backend.domain.order.dto.OrderItemRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "p_order_item")
@@ -37,4 +38,13 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    // 주문 아이템 생성 – OrderItemRequestDto와 Item을 이용
+    public static OrderItem createOrderItem(OrderItemRequestDto dto, Item item) {
+        return OrderItem.builder()
+                .orderItemId(UUID.randomUUID())
+                .item(item)
+                .quantity(dto.getQuantity())
+                .price(item.getPrice().multiply(BigDecimal.valueOf(dto.getQuantity())))
+                .build();
+    }
 }
