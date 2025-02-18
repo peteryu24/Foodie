@@ -67,7 +67,7 @@ public class OrderController {
         OrderDetailResponseDto detail = orderService.getOrderDetail(UUID.fromString(orderId));
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
-                        .code(ResponseCode.S)
+                        .code(ResponseCode.NS)
                         .message("주문 상세 조회")
                         .data(detail)
                         .build()
@@ -86,7 +86,7 @@ public class OrderController {
             var orders = orderService.searchOrders(memberId, storeName, productName);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
-                            .code(ResponseCode.S)
+                            .code(ResponseCode.NS)
                             .message("검색 주문 조회")
                             .data(orders)
                             .build()
@@ -95,7 +95,7 @@ public class OrderController {
             var orders = orderService.getUserOrders(memberId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
-                            .code(ResponseCode.S)
+                            .code(ResponseCode.NS)
                             .message("회원 주문 조회")
                             .data(orders)
                             .build()
@@ -104,7 +104,7 @@ public class OrderController {
             var orders = orderService.getStoreOrders(storeId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
-                            .code(ResponseCode.S)
+                            .code(ResponseCode.NS)
                             .message("가게 주문 조회")
                             .data(orders)
                             .build()
