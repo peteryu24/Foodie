@@ -17,7 +17,7 @@ public class StoreResponseDto {
     private String content;
     private String address;
     private StoreStatus status;
-    private Long ownerId;
+    private Long memberId;
     private List<String> categoryIds;
     private double avgScore;
 
@@ -27,7 +27,7 @@ public class StoreResponseDto {
         this.content = store.getContent();
         this.address = store.getAddress();
         this.status = store.getStatus();
-        this.ownerId = store.getOwner().getMemberId();
+        this.memberId = store.getMember().getMemberId();
         this.categoryIds = store.getStoreCategories().stream()
                 .map(StoreCategory::getCategoryId)
                 .collect(Collectors.toList());

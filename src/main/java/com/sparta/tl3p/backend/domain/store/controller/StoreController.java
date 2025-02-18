@@ -52,8 +52,8 @@ public class StoreController {
 
     // 본인의 가게 목록 조회
     @GetMapping("/owner/stores")
-    public ResponseEntity<SuccessResponseDto> getMyStores(@AuthenticationPrincipal Long ownerId) {
-        List<StoreResponseDto> stores = storeService.getStoresByOwner(ownerId);
+    public ResponseEntity<SuccessResponseDto> getMyStores(@AuthenticationPrincipal Long memberId) {
+        List<StoreResponseDto> stores = storeService.getStoresByOwner(memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)
@@ -68,8 +68,8 @@ public class StoreController {
     public ResponseEntity<SuccessResponseDto> updateStore(
             @PathVariable UUID storeId,
             @RequestBody @Valid StoreRequestDto requestDto,
-            @AuthenticationPrincipal Long ownerId) {
-        storeService.updateStore(storeId, requestDto, ownerId);
+            @AuthenticationPrincipal Long memberId) {
+        storeService.updateStore(storeId, requestDto, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)
@@ -81,8 +81,8 @@ public class StoreController {
 
     // 가게 숨김
     @PatchMapping("/{storeId}")
-    public ResponseEntity<SuccessResponseDto> hideStore(@PathVariable UUID storeId, @AuthenticationPrincipal Long ownerId) {
-        storeService.hideStore(storeId, ownerId);
+    public ResponseEntity<SuccessResponseDto> hideStore(@PathVariable UUID storeId, @AuthenticationPrincipal Long memberId) {
+        storeService.hideStore(storeId, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)
@@ -94,8 +94,8 @@ public class StoreController {
 
     // 가게 삭제
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<SuccessResponseDto> deleteStore(@PathVariable UUID storeId, @AuthenticationPrincipal Long ownerId) {
-        storeService.deleteStore(storeId, ownerId);
+    public ResponseEntity<SuccessResponseDto> deleteStore(@PathVariable UUID storeId, @AuthenticationPrincipal Long memberId) {
+        storeService.deleteStore(storeId, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)

@@ -36,17 +36,17 @@ public class Store extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id") // nullable = false 임시제거
-    private Member owner;
+    private Member member;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreCategory> storeCategories = new HashSet<>();
 
     @Builder
-    public Store(String name, String content, String address, Member owner) {
+    public Store(String name, String content, String address, Member member) {
         this.name = name;
         this.content = content;
         this.address = address;
-        this.owner = owner;
+        this.member = member;
     }
 
     public void updateStore(String name, String content, String address, StoreStatus status) {
