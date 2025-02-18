@@ -15,12 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 public class StoreRequestDto {
 
-    @NotBlank(message = "가게 이름은 필수입니다.")
+    @NotNull(message = "가게 이름은 필수입니다.")
     private String name;
 
     private String content;
 
-    @NotBlank(message = "주소는 필수입니다.")
+    @NotNull(message = "주소는 필수입니다.")
     private Address address;
 
     @NotNull(message = "가게 상태는 필수입니다.")
@@ -30,4 +30,10 @@ public class StoreRequestDto {
     private Long memberId;
 
     private List<String> categoryIds;
+
+    // ✅ 테스트용 생성자 추가
+    public StoreRequestDto(String name, String content) {
+        this.name = name;
+        this.content = content;
+    }
 }
