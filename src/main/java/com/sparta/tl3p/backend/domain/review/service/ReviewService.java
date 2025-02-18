@@ -17,15 +17,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-//    private final OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional
     public void createReview(UUID orderId, String content, double score) {
-//        Order order = orderRepository.findById(orderId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
         Review review = new Review();
-        // todo: 더미 데이터 제거
-        review.createReview(content, score, new Order());
+        review.createReview(content, score, order);
+
         reviewRepository.save(review);
     }
 
