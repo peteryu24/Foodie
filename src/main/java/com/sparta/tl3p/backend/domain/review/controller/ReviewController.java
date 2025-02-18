@@ -47,9 +47,9 @@ public class ReviewController {
 
     @GetMapping
     public ResponseEntity<SuccessResponseDto> searchReviews(
-            @RequestParam(required = false, defaultValue = "") UUID storeId,
-            @RequestParam(required = false, defaultValue = "") String product) {
-        List<ReviewResponseDto> responseDtos = reviewService.searchReviews(storeId, product);
+            @RequestParam(required = false) UUID storeId,
+            @RequestParam(required = false) String query) {
+        List<ReviewResponseDto> responseDtos = reviewService.searchReviews(storeId, query);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.NS)
