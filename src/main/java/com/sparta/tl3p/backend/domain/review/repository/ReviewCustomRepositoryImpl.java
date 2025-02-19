@@ -7,6 +7,7 @@ import com.sparta.tl3p.backend.domain.order.entity.QOrder;
 import com.sparta.tl3p.backend.domain.order.entity.QOrderItem;
 import com.sparta.tl3p.backend.domain.review.entity.QReview;
 import com.sparta.tl3p.backend.domain.review.entity.Review;
+import com.sparta.tl3p.backend.domain.review.entity.ReviewStatus;
 import com.sparta.tl3p.backend.domain.store.entity.QStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -35,6 +36,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository{
                 .join(qOrderItem.item, qItem)
                 .join(qReview.store, qStore)
                 .where(
+                        qReview.status.notIn(ReviewStatus.DELETED),
                         storeId != null ? qStore.storeId.eq(storeId) : null,
                         query != null ? qItem.name.contains(query) : null
                 )
@@ -60,6 +62,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository{
                 .join(qOrder.member, qMember)  // Order -> Member
                 .join(qReview.store, qStore)  // Review -> Store
                 .where(
+                        qReview.status.notIn(ReviewStatus.DELETED),
                         storeId != null ? qStore.storeId.eq(storeId) : null,
                         qMember.memberId.eq(memberId)
                 )
