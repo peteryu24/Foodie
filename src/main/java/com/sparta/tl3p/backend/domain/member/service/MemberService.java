@@ -2,6 +2,9 @@ package com.sparta.tl3p.backend.domain.member.service;
 
 import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ErrorCode;
+import com.sparta.tl3p.backend.common.util.JwtTokenProvider;
+import com.sparta.tl3p.backend.domain.member.dto.LoginRequestDto;
+import com.sparta.tl3p.backend.domain.member.dto.LoginResponseDto;
 import com.sparta.tl3p.backend.domain.member.dto.MemberRequestDto;
 import com.sparta.tl3p.backend.domain.member.dto.MemberResponseDto;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
@@ -21,6 +24,8 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     //회원가입
     public MemberResponseDto signupMember(MemberRequestDto requestDto) {
@@ -90,4 +95,39 @@ public class MemberService {
         return members.stream().map(MemberResponseDto::new).collect(Collectors.toList());
     }
 
+    // 로그인
+    public LoginResponseDto login(LoginRequestDto requestDto) {
+
+        // 사용자 조회
+        Member member = memberRepository.findByUsername(requestDto.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
+            throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // Access Token 과 Refresh Token 생성
+        String accessToken = jwtTokenProvider.createAccessToken(member.getMemberId(), member.getRole());
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
+
+
+        redisService.saveRefreshToken(member.getMemberId(), refreshToken, 7 * 24 * 60 * 60 * 1000L);// 7일
+
+        return new LoginResponseDto(accessToken, refreshToken);
+    }
+
+    // 로그아웃
+    public void logout(String token) {
+        // "Bearer " 제거 후 토큰 값만 추출
+        String pureToken = token.substring(7).trim();
+
+        if(pureToken.isEmpty()){
+            throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
+        }
+
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(pureToken); // 토큰에서 memberId 추출
+
+        redisService.deleteRefreshToken(memberId); // Redis에서 Refresh Token 삭제
+    }
 }
