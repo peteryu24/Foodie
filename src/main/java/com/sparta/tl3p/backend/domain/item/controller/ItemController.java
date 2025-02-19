@@ -43,7 +43,7 @@ public class ItemController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<SuccessResponseDto> createItem(
             @Valid @RequestBody ItemCreateRequestDto request
     ) {
@@ -55,7 +55,7 @@ public class ItemController {
     }
 
     @PutMapping("/{itemId}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<SuccessResponseDto> updateItem(
             @PathVariable UUID itemId,
             @Valid @RequestBody ItemUpdateRequestDto request
@@ -68,7 +68,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<SuccessResponseDto> deleteItem(@PathVariable UUID itemId) {
         itemService.deleteItem(itemId);
         return ResponseEntity.ok(SuccessResponseDto.builder()
@@ -78,7 +78,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<SuccessResponseDto> hideItem(@PathVariable UUID itemId) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
