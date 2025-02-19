@@ -67,7 +67,7 @@ public class AIDescriptionService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        GeminiApiRequestDto geminiApiRequest = GeminiApiRequestDto.of(prompt);
+        GeminiApiRequestDto geminiApiRequest = GeminiApiRequestDto.from(prompt);
 
         try {
             ResponseEntity<GeminiApiResponseDto> response = restTemplate.exchange(

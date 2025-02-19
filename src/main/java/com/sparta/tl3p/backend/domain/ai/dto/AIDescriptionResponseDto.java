@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 public class AIDescriptionResponseDto {
     private String response;
-    
+
     public static AIDescriptionResponseDto from(AIDescription aiDescription) {
         return AIDescriptionResponseDto.builder()
                 .response(aiDescription.getResponse())

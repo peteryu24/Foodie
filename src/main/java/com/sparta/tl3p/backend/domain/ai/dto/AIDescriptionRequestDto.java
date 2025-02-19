@@ -6,5 +6,5 @@ import java.util.UUID;
 
 @Getter
 public class AIDescriptionRequestDto {
-    private UUID   itemId;
+    private UUID itemId;
 }
