@@ -35,35 +35,35 @@ public class PaymentController {
     }
 
     /**
-     * 유저별 및 가게별 결제 내역 조회 API
+     * 멤버별 및 가게별 결제 내역 조회 API
      *
-     * GET /api/v1/payments?userId={userId}  -> 유저별 결제 내역 조회
-     * GET /api/v1/payments?storeId={storeId} -> 가게별 결제 내역 조회
+     * GET /api/v1/payments?memberId={memberId}  -> 멤버별 결제 내역 조회
+     * GET /api/v1/payments?storeId={storeId}    -> 가게별 결제 내역 조회
      *
      * 파라미터가 둘 다 없는 경우에는 에러를 반환합니다.
      */
     @GetMapping
     public ResponseEntity<SuccessResponseDto> getPayments(
-            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long memberId,
             @RequestParam(required = false) UUID storeId) {
 
-        if (userId != null && storeId != null) {
+        if (memberId != null && storeId != null) {
             return ResponseEntity.badRequest().body(
                     SuccessResponseDto.builder()
                             .code(ResponseCode.S)
-                            .message("userId와 storeId 둘 다 동시에 제공할 수 없습니다.")
+                            .message("memberId와 storeId 둘 다 동시에 제공할 수 없습니다.")
                             .data(new HashMap<>())
                             .build()
             );
-        } else if (userId != null) {
-            List<PaymentResponseDto> payments = paymentService.getPaymentsByUserId(userId);
+        } else if (memberId != null) {
+            List<PaymentResponseDto> payments = paymentService.getPaymentsByMemberId(memberId);
             var data = new HashMap<String, Object>();
-            data.put("userId", userId);
+            data.put("memberId", memberId);
             data.put("payments", payments);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
                             .code(ResponseCode.NS)
-                            .message("User payment details")
+                            .message("Member payment details")
                             .data(data)
                             .build()
             );
@@ -83,7 +83,7 @@ public class PaymentController {
             return ResponseEntity.badRequest().body(
                     SuccessResponseDto.builder()
                             .code(ResponseCode.S)
-                            .message("userId 또는 storeId 중 하나를 제공하세요")
+                            .message("memberId 또는 storeId 중 하나를 제공하세요")
                             .data(new HashMap<>())
                             .build()
             );

@@ -9,14 +9,15 @@ import com.sparta.tl3p.backend.domain.order.dto.OrderResponseDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
 import com.sparta.tl3p.backend.domain.order.entity.OrderItem;
+import com.sparta.tl3p.backend.domain.item.entity.Item;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
+import com.sparta.tl3p.backend.domain.order.repository.OrderRepository;
 import com.sparta.tl3p.backend.domain.payment.dto.PaymentRequestDto;
 import com.sparta.tl3p.backend.domain.payment.dto.PaymentResponseDto;
 import com.sparta.tl3p.backend.domain.payment.entity.Payment;
 import com.sparta.tl3p.backend.domain.payment.enums.PaymentStatus;
 import com.sparta.tl3p.backend.domain.payment.service.PaymentService;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
-import com.sparta.tl3p.backend.domain.item.entity.Item;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -31,19 +32,16 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
-    // PaymentService는 생성자 주입을 통해 반드시 초기화되어야 함
     private final PaymentService paymentService;
+    private final OrderRepository orderRepository;
 
-    // in‑memory 주문 저장소 (실제 서비스에서는 Repository 사용)
+    // in‑memory 주문 저장소 (create/update/cancel 등은 여전히 in‑memory로 처리)
     private final Map<UUID, Order> orderStore = new ConcurrentHashMap<>();
-
     // 모의 회원, 가게, 상품 데이터 저장소
     private final Map<Long, Member> memberMap = new HashMap<>();
     private final Map<UUID, Store> storeMap = new HashMap<>();
-
     // 모의 상품 데이터: 상품 ID → (상품명, 가격)
     private final Map<UUID, ItemInfo> productMap = new HashMap<>();
-
     // 내부 클래스: 상품 정보 (이름, 가격)
     private static class ItemInfo {
         String name;
@@ -68,10 +66,11 @@ public class OrderService {
     }
 
     /**
-     * PaymentService를 생성자 주입받으면서 모의 데이터도 초기화합니다.
+     * PaymentService와 OrderRepository를 생성자 주입받으면서 모의 데이터도 초기화합니다.
      */
-    public OrderService(PaymentService paymentService) {
+    public OrderService(PaymentService paymentService, OrderRepository orderRepository) {
         this.paymentService = paymentService;
+        this.orderRepository = orderRepository;
         initMockData();
     }
 
@@ -189,7 +188,7 @@ public class OrderService {
         // 결제의 UUID를 콘솔에 출력
         System.out.println("Payment UUID: " + payment.getPaymentId());
 
-        // 주문 저장
+        // 주문 저장 (in‑memory)
         orderStore.put(order.getOrderId(), order);
         return new OrderResponseDto(order);
     }
@@ -239,26 +238,14 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // 회원 주문 내에서 가게 이름 또는 주문한 상품 이름으로 검색
+    /**
+     * QueryDSL을 활용한 주문 검색 기능.
+     * OrderRepositoryImpl의 searchOrders() 메서드를 호출합니다.
+     */
     @Transactional(readOnly = true)
     public List<OrderResponseDto> searchOrders(Long memberId, String storeName, String productName) {
-        return orderStore.values().stream()
-                .filter(order -> order.getMember().getMemberId().equals(memberId))
-                .filter(order -> {
-                    boolean matchesStore = true;
-                    boolean matchesProduct = true;
-                    if (StringUtils.hasText(storeName)) {
-                        matchesStore = order.getStore().getName().toLowerCase()
-                                .contains(storeName.toLowerCase());
-                    }
-                    if (StringUtils.hasText(productName)) {
-                        matchesProduct = order.getOrderItems().stream()
-                                .anyMatch(item -> item.getItem().getName().toLowerCase()
-                                        .contains(productName.toLowerCase()));
-                    }
-                    return matchesStore && matchesProduct;
-                })
-                .map(OrderResponseDto::new)
-                .collect(Collectors.toList());
+        // QueryDSL 기반 검색 (실제 DB를 사용하는 경우)
+        List<Order> orders = orderRepository.searchOrders(memberId, storeName, productName);
+        return orders.stream().map(OrderResponseDto::new).collect(Collectors.toList());
     }
 }

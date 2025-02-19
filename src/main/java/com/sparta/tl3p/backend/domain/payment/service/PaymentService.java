@@ -25,9 +25,6 @@ public class PaymentService {
     /**
      * 외부 PG사 API와 연동하는 결제 요청을 모의로 처리합니다.
      * PaymentRequestDto를 받아 결제 승인(모의) 후 PaymentResponseDto를 반환합니다.
-     *
-     * 결제 요청 시 결제 ID(paymentId)는 UUID.randomUUID()로 생성되며,
-     * 이 값은 결제 내역 상세조회 API(GET /api/v1/payments/{paymentId})에서 확인할 수 있습니다.
      */
     public PaymentResponseDto requestPayment(Order order, PaymentRequestDto requestDto) {
         Payment payment = Payment.builder()
@@ -60,12 +57,12 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
-    // 유저별 결제 내역 조회 (Order의 Member의 memberId 기준)
-    public List<PaymentResponseDto> getPaymentsByUserId(Long userId) {
+    // 유저(멤버)별 결제 내역 조회 (Order의 Member의 memberId 기준)
+    public List<PaymentResponseDto> getPaymentsByMemberId(Long memberId) {
         return paymentStore.values().stream()
                 .filter(payment -> payment.getOrder() != null &&
                         payment.getOrder().getMember() != null &&
-                        payment.getOrder().getMember().getMemberId().equals(userId))
+                        payment.getOrder().getMember().getMemberId().equals(memberId))
                 .map(PaymentResponseDto::new)
                 .collect(Collectors.toList());
     }
