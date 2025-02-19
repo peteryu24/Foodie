@@ -2,7 +2,11 @@ package com.sparta.tl3p.backend.domain.order.controller;
 
 import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
 import com.sparta.tl3p.backend.common.type.ResponseCode;
-import com.sparta.tl3p.backend.domain.order.dto.*;
+import com.sparta.tl3p.backend.domain.order.dto.OrderCancelRequestDto;
+import com.sparta.tl3p.backend.domain.order.dto.OrderDetailResponseDto;
+import com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto;
+import com.sparta.tl3p.backend.domain.order.dto.OrderResponseDto;
+import com.sparta.tl3p.backend.domain.order.dto.OrderUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +24,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // 주문 생성
+    // 1. 주문 생성: POST /api/v1/orders
     @PostMapping
     public ResponseEntity<SuccessResponseDto> createOrder(@RequestBody OrderRequestDto request) {
         OrderResponseDto response = orderService.createOrder(request);
@@ -33,7 +37,7 @@ public class OrderController {
         );
     }
 
-    // 주문 수정
+    // 2. 주문 수정: PUT /api/v1/orders/{orderId}
     @PutMapping("/{orderId}")
     public ResponseEntity<SuccessResponseDto> updateOrder(@PathVariable String orderId,
                                                           @RequestBody OrderUpdateRequestDto request) {
@@ -47,7 +51,7 @@ public class OrderController {
         );
     }
 
-    // 주문 취소
+    // 3. 주문 취소: POST /api/v1/orders/{orderId}/cancel
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<SuccessResponseDto> cancelOrder(@PathVariable String orderId,
                                                           @RequestBody OrderCancelRequestDto request) {
@@ -61,7 +65,7 @@ public class OrderController {
         );
     }
 
-    // 주문 상세조회
+    // 4. 주문 상세조회: GET /api/v1/orders/{orderId}
     @GetMapping("/{orderId}")
     public ResponseEntity<SuccessResponseDto> getOrderDetail(@PathVariable String orderId) {
         OrderDetailResponseDto detail = orderService.getOrderDetail(UUID.fromString(orderId));
@@ -74,7 +78,10 @@ public class OrderController {
         );
     }
 
-    // 회원별, 가게별 및 검색 (가게 이름, 상품 이름) 주문조회
+    // 5. 주문 조회 및 검색
+    //    1) 회원별 주문 조회: GET /api/v1/orders?memberId={memberId}
+    //    2) 가게별 주문 조회: GET /api/v1/orders?storeId={storeId}
+    //    3) QueryDSL 검색 (가게 이름, 상품 이름 포함): GET /api/v1/orders?memberId={memberId}&storeName={storeName}&productName={productName}
     @GetMapping
     public ResponseEntity<SuccessResponseDto> getOrders(
             @RequestParam(required = false) Long memberId,
@@ -83,6 +90,7 @@ public class OrderController {
             @RequestParam(required = false) String productName) {
 
         if (memberId != null && (storeName != null || productName != null)) {
+            // QueryDSL을 활용한 검색
             var orders = orderService.searchOrders(memberId, storeName, productName);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
@@ -92,6 +100,7 @@ public class OrderController {
                             .build()
             );
         } else if (memberId != null) {
+            // 단순 회원별 주문 조회
             var orders = orderService.getUserOrders(memberId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
@@ -101,6 +110,7 @@ public class OrderController {
                             .build()
             );
         } else if (storeId != null) {
+            // 단순 가게별 주문 조회
             var orders = orderService.getStoreOrders(storeId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
