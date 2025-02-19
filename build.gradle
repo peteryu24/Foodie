@@ -28,6 +28,18 @@ ext {
 }
 
 dependencies {
+	// H2 Database
+	testImplementation 'com.h2database:h2:2.2.224'
+
+	// JUnit 5 (Jupiter)
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+
+	// Mockito
+	testImplementation 'org.mockito:mockito-core:4.8.1'
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.8.1'
+
+	// AssertJ
+	testImplementation 'org.assertj:assertj-core:3.23.1'
 
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Spring Security 추가
 
