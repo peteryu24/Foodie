@@ -48,6 +48,4 @@ public class AIDescription extends BaseEntity {
         this.prompt = prompt;
         this.response = response;
     }
-
-
 }
