@@ -28,10 +28,10 @@ public class AIDescriptionService {
     private final ItemRepository          itemRepository;
     private final RestTemplate            restTemplate;
 
-    @Value("${gemini.api.key}")
+    @Value("${api.gemini.key}")
     private String apiKey;
 
-    @Value("${gemini.api.url}")
+    @Value("${api.gemini.url}")
     private String apiUrl;
 
     @Transactional
@@ -80,8 +80,7 @@ public class AIDescriptionService {
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 throw new BusinessException(ErrorCode.API_STATUS_ERROR);
             }
-
-            return extractGeminiResponse(response.getBody());
+            return response.getBody().extractText();
         } catch (RestClientException e) {
             throw new BusinessException(ErrorCode.API_UNEXPECTED_ERROR);
         }
@@ -99,15 +98,5 @@ public class AIDescriptionService {
                 item.getStore().getName()
                 //                ,item.getStore().getStoreCategories().toString()
         );
-    }
-
-    private String extractGeminiResponse(GeminiApiResponseDto geminiApiResponse) {
-        return geminiApiResponse.getCandidates().stream()
-                .findFirst()
-                .map(GeminiApiResponseDto.Candidate::getContent)
-                .map(GeminiApiResponseDto.Content::getParts)
-                .flatMap(parts -> parts.stream().findFirst())
-                .map(GeminiApiResponseDto.Part::getText)
-                .orElseThrow(() -> new BusinessException(ErrorCode.API_RESPONSE_PARSE_ERROR));
     }
 }
