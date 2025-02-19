@@ -19,6 +19,8 @@ public enum ErrorCode {
     // Order
     ORDER_NOT_FOUND("O-001", "Order Not Found"),
     // Payment
+    PAYMENT_NOT_FOUND("P-001", "Payment Not Found"),
+    PAYMENT_FAILED("P-002", "Payment Failed"),
 
     // Valid
     ARGUMENT_NOT_VALID("V-001", "Method Argument Not Valid"),
