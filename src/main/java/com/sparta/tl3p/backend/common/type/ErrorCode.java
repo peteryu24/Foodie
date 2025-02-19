@@ -25,6 +25,13 @@ public enum ErrorCode {
     // Valid
     ARGUMENT_NOT_VALID("V-001", "Method Argument Not Valid"),
 
+    // API
+    API_UNEXPECTED_ERROR("A-001","API Error"),
+    API_CALL_ERROR("A-002", "API Call Error"),
+    REST_TEMPLATE_ERROR("A-003", "REST Template Error"),
+    API_STATUS_ERROR("A-004", "API Status Error"),
+    API_RESPONSE_PARSE_ERROR("A-005", "API Response Parse Error"),
+
     // Unexpected Exception
     UNEXPECTED_ERROR("D-001", "Unexpected error ");
 
