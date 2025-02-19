@@ -4,6 +4,7 @@ import com.sparta.tl3p.backend.common.audit.BaseEntity;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,10 +48,21 @@ public class Review extends BaseEntity {
         this.status = ReviewStatus.UPDATED;
     }
 
-    public void createReview(String content, Double score, Order order) {
+    public static Review createReview(String content, Double score, Order order) {
+        Review review = Review.builder()
+                .content(content)
+                .score(score)
+                .order(order)
+                .build();
+        review.store = order.getStore();
+        order.setReview(review);  // 양방향 연관관계 처리
+        return review;
+    }
+
+    @Builder
+    private Review(String content, Double score, Order order) {
         this.content = content;
         this.score = score;
         this.order = order;
-        this.store = order.getStore();
     }
 }
