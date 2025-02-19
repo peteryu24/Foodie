@@ -8,6 +8,7 @@ import com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderResponseDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
+import com.sparta.tl3p.backend.domain.order.entity.OrderItem;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.payment.dto.PaymentRequestDto;
 import com.sparta.tl3p.backend.domain.payment.dto.PaymentResponseDto;
@@ -15,6 +16,7 @@ import com.sparta.tl3p.backend.domain.payment.entity.Payment;
 import com.sparta.tl3p.backend.domain.payment.enums.PaymentStatus;
 import com.sparta.tl3p.backend.domain.payment.service.PaymentService;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
+import com.sparta.tl3p.backend.domain.item.entity.Item;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -120,6 +122,7 @@ public class OrderService {
     /**
      * 주문 생성 시, 주문 정보와 함께 PG사 결제 요청을 진행합니다.
      * 결제 승인된 경우에만 주문을 저장하고 응답합니다.
+     * 주문 생성 후 결제의 UUID가 콘솔에 출력됩니다.
      */
     @Transactional
     public OrderResponseDto createOrder(OrderRequestDto dto) {
@@ -149,6 +152,25 @@ public class OrderService {
         // 주문 엔티티 생성 (주문 아이템 처리 등은 별도 처리)
         Order order = Order.createOrder(dto, member, store);
         order.setCreatedAt(LocalDateTime.now());
+
+        // 주문 요청 시 전달된 items를 OrderItem 엔티티로 변환하여 order에 설정
+        if (dto.getItems() != null && !dto.getItems().isEmpty()) {
+            var orderItems = dto.getItems().stream().map(itemDto -> {
+                var info = productMap.get(itemDto.getItemId());
+                if (info == null) {
+                    throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
+                }
+                // 더미 Item 엔티티 생성 (Item 엔티티의 Builder 사용)
+                Item item = Item.builder()
+                        .name(info.name)
+                        .price(info.price)
+                        .description("상품 설명")
+                        .build();
+                // OrderItem 생성 (OrderItem.createOrderItem() 메서드를 사용)
+                return OrderItem.createOrderItem(itemDto, item);
+            }).collect(Collectors.toList());
+            order.setOrderItems(orderItems);
+        }
 
         // PaymentRequestDto 생성 (카드 결제만 지원)
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto();
