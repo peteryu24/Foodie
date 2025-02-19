@@ -25,11 +25,11 @@ public class ItemController {
     public ResponseEntity<SuccessResponseDto> getAllItems(
             @ModelAttribute @Valid ItemSearchRequestDto request
     ) {
-        Page<ItemResponseDto> result = itemService.getAllItems(request).map(ItemResponseDto::of);
+        Page<ItemResponseDto> result = itemService.getAllItems(request).map(ItemResponseDto::from);
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 목록 조회 성공")
-                .data(ItemPageResponseDto.of(result))
+                .data(ItemPageResponseDto.from(result))
                 .build());
     }
 

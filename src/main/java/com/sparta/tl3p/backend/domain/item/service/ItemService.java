@@ -25,7 +25,7 @@ public class ItemService {
     //    private final StoreRepository storeRepository;
 
     public ItemResponseDto getItem(UUID itemId) {
-        return ItemResponseDto.of(
+        return ItemResponseDto.from(
                 itemRepository.findById(itemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND))
         );
@@ -44,7 +44,7 @@ public class ItemService {
                 .description(request.getDescription())
                 .build();
 
-        return ItemResponseDto.of(itemRepository.save(item));
+        return ItemResponseDto.from(itemRepository.save(item));
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class ItemService {
                 request.getStatus()
         );
 
-        return ItemResponseDto.of(item);
+        return ItemResponseDto.from(item);
     }
 
 
@@ -83,6 +83,6 @@ public class ItemService {
         Item item = findItemById(id);
         item.hideItem();
 
-        return ItemResponseDto.of(item);
+        return ItemResponseDto.from(item);
     }
 }

@@ -17,7 +17,7 @@ public class ItemPageResponseDto {
     private final boolean               hasNext;
     private final boolean               hasPrev;
 
-    public static ItemPageResponseDto of(Page<ItemResponseDto> page) {
+    public static ItemPageResponseDto from(Page<ItemResponseDto> page) {
         return ItemPageResponseDto.builder()
                 .items(page.getContent())
                 .totalElements(page.getTotalElements())
