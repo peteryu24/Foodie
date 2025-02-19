@@ -3,6 +3,7 @@ package com.sparta.tl3p.backend.domain.item.dto;
 import com.sparta.tl3p.backend.domain.item.enums.ItemSortOption;
 import lombok.*;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,7 +31,9 @@ public class ItemSearchRequestDto {
         return (page != null && page > 0) ? page - 1 : 0;
     }
 
-    public int getValidatedSize() {
-        return size != null && Set.of(10, 30, 50).contains(size) ? size : 10;
+    public int getSize() {
+        return Optional.ofNullable(size)
+                .filter(s -> Set.of(10, 30, 50).contains(s))
+                .orElse(10);
     }
 }

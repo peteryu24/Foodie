@@ -29,7 +29,7 @@ public class ItemController {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 목록 조회 성공")
-                .data(ItemPageResponseDto.from(result))
+                .data(ItemPageResponseDto.of(result, request.getSortOption()))
                 .build());
     }
 
