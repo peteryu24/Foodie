@@ -20,6 +20,6 @@ public class OrderItemDetailDto {
         this.quantity = orderItem.getQuantity();
         this.price = orderItem.getPrice();
         // Item 엔티티의 식별자 타입이 UUID라고 가정
-        this.itemId = orderItem.getItem().getId();
+        this.itemId = orderItem.getItem().getItemId();
     }
 }
