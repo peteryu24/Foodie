@@ -63,6 +63,10 @@ public class Item extends BaseEntity {
         this.status = ItemStatus.HIDDEN;
     }
 
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public void softDelete(Long deleteUserId) {
         super.softDelete(deleteUserId);
