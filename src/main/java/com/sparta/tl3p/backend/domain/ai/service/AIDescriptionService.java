@@ -92,11 +92,11 @@ public class AIDescriptionService {
                 "다음은 음식점 메뉴 상품 정보이다:\n" +
                         "상품명: %s\n" +
                         "가게이름: %s\n" +
-                        //                        "음식 카테고리: %s\n " +
+                        // "음식 카테고리: %s\n " +
                         "음식 배송 서비스에 제품을 등록하기 위해 해당 메뉴에 대한 실제 입력할 설명을 가게이름과 상품이름의 특색을 살려 맛, 재료, 특징 등을 표현한 답변을 50자 이하로 작성.",
                 item.getName(),
                 item.getStore().getName()
-                //                ,item.getStore().getStoreCategories().toString()
+                // ,item.getStore().getStoreCategories().toString()
         );
     }
 }

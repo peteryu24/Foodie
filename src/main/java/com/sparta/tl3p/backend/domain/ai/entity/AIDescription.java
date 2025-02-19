@@ -32,6 +32,7 @@ public class AIDescription extends BaseEntity {
     private Item item;
 
     // TODO: 연관관계 재설정
+
     //    @ManyToOne(fetch = FetchType.LAZY)
     //    @JoinColumn(name = "member_id", nullable = false)
     //    private Member member;
