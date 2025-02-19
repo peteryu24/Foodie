@@ -13,7 +13,7 @@ import java.util.UUID;
 public class OrderRequestDto {
     private OrderType orderType;
     private PaymentMethod paymentMethod;
-    private String deliveryAddress;
+    private Address deliveryAddress;
     private String storeRequest;
     private Long memberId;
     private UUID storeId;
