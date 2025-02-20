@@ -3,6 +3,7 @@ package com.sparta.tl3p.backend.domain.payment.dto;
 import com.sparta.tl3p.backend.domain.payment.entity.Payment;
 import com.sparta.tl3p.backend.domain.payment.enums.PaymentMethod;
 import com.sparta.tl3p.backend.domain.payment.enums.PaymentStatus;
+import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 public class PaymentResponseDto {
     private UUID paymentId;
     private PaymentStatus paymentStatus;
-    private int amount;
+    private BigDecimal amount;
     private PaymentMethod paymentMethod;
     private LocalDateTime paymentDate;
 

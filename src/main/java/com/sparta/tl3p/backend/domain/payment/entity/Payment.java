@@ -5,6 +5,7 @@ import com.sparta.tl3p.backend.domain.payment.enums.PaymentMethod;
 import com.sparta.tl3p.backend.domain.payment.enums.PaymentStatus;
 import com.sparta.tl3p.backend.domain.order.entity.Order;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ public class Payment extends BaseEntity {
     private PaymentStatus paymentStatus;
 
     @Column(name = "amount")
-    private int amount;
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
