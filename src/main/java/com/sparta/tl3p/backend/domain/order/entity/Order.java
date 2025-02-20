@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.order.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.order.enums.DataStatus;
@@ -40,8 +41,9 @@ public class Order extends BaseEntity {
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
+    @Embedded
     @Column(name = "delivery_address")
-    private String deliveryAddress;
+    private Address deliveryAddress;
 
     @Column(name = "store_request")
     private String storeRequest;
