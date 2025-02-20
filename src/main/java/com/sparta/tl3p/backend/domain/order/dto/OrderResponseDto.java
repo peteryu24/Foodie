@@ -1,25 +1,22 @@
 package com.sparta.tl3p.backend.domain.order.dto;
 
-import com.sparta.tl3p.backend.domain.order.enums.DataStatus;
-import com.sparta.tl3p.backend.domain.order.enums.OrderType;
-import com.sparta.tl3p.backend.domain.order.enums.PaymentMethod;
-import lombok.*;
+import com.sparta.tl3p.backend.common.type.Address;
+import com.sparta.tl3p.backend.domain.order.entity.Order;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Setter
 public class OrderResponseDto {
     private UUID orderId;
-    private OrderType orderType;
-    private PaymentMethod paymentMethod;
-    private String deliveryAddress;
-    private String storeRequest;
-    private DataStatus status;           // CREATED, UPDATED, DELETED
-    private LocalDateTime createdAt;
-    private UUID storeId;
-    private Long userId;
+    private String status;
+    private Address deliveryAddress;
+
+    public OrderResponseDto(Order order) {
+        this.orderId = order.getOrderId();
+        this.status = order.getStatus().name();
+        this.deliveryAddress = order.getDeliveryAddress();
+    }
 }

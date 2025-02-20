@@ -21,11 +21,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                                .requestMatchers("/api/v1/**").permitAll()
-                                .anyRequest().authenticated()
-                        );
+                        //                        .requestMatchers("/api/v1/members/signup").permitAll()
+                        .requestMatchers("/api/**").permitAll()        // 개발 중 api 테스트를 위해 모든 요청에 대한 인증 절차 생략
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // springdoc-openapi
+                        .anyRequest().authenticated()
+                );
         return http.build();
-
     }
-
 }

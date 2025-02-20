@@ -33,7 +33,9 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<SuccessResponseDto> updateReview(@PathVariable UUID reviewId, @RequestBody ReviewUpdateRequestDto requestDto) {
+    public ResponseEntity<SuccessResponseDto> updateReview(
+            @PathVariable UUID reviewId,
+            @RequestBody ReviewUpdateRequestDto requestDto) {
         reviewService.updateReview(reviewId, requestDto.getContent(), requestDto.getScore());
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -47,9 +49,9 @@ public class ReviewController {
 
     @GetMapping
     public ResponseEntity<SuccessResponseDto> searchReviews(
-            @RequestParam(required = false, defaultValue = "") UUID storeId,
-            @RequestParam(required = false, defaultValue = "") String product) {
-        List<ReviewResponseDto> responseDtos = reviewService.searchReviews(storeId, product);
+            @RequestParam(required = false) UUID storeId,
+            @RequestParam(required = false) String query) {
+        List<ReviewResponseDto> responseDtos = reviewService.searchReviews(storeId, query);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.NS)
@@ -61,8 +63,8 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}")
-    public ResponseEntity<SuccessResponseDto> searchReview(@PathVariable UUID reviewId) {
-        ReviewResponseDto responseDto = reviewService.searchReview(reviewId);
+    public ResponseEntity<SuccessResponseDto> findReview(@PathVariable UUID reviewId) {
+        ReviewResponseDto responseDto = reviewService.findReview(reviewId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.NS)
@@ -89,7 +91,7 @@ public class ReviewController {
         reviewService.deleteReview(reviewId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
-                        .code(ResponseCode.S)
+                        .code(ResponseCode.NS)
                         .message("리뷰가 영구적으로 삭제되었습니다.")
                         .data(null)
                         .build()
