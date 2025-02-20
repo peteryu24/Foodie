@@ -8,5 +8,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, UUID>, ReviewCustomRepository {
-    Optional<Review> findByIdAndNotInReviewStatus(UUID reviewId, ReviewStatus reviewStatus);
+    Optional<Review> findByReviewIdAndStatusNot(UUID reviewId, ReviewStatus reviewStatus);
 }
