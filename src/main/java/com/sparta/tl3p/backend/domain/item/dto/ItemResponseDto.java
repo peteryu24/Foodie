@@ -22,7 +22,7 @@ public class ItemResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public static ItemResponseDto of(Item item) {
+    public static ItemResponseDto from(Item item) {
         return ItemResponseDto.builder()
                 .id(item.getItemId())
                 .storeId(item.getStore().getStoreId())

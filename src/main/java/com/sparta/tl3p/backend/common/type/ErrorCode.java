@@ -25,6 +25,7 @@ public enum ErrorCode {
 
     // Valid
     ARGUMENT_NOT_VALID("V-001", "Method Argument Not Valid"),
+    PARAM_NOT_VALID("V-002", "Param Not Valid"),
 
     // API
     API_UNEXPECTED_ERROR("A-001","API Error"),

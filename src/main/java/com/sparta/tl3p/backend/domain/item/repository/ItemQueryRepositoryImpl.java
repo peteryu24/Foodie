@@ -46,8 +46,8 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         List<Item> data = queryFactory.selectFrom(item)
                 //                .leftJoin(item.store).fetchJoin()
                 .where(builder)
-                .offset((long) request.getPage() * request.getValidatedSize())
-                .limit(request.getValidatedSize())
+                .offset((long) request.getPage() * request.getSize())
+                .limit(request.getSize())
                 .orderBy(getOrderSpecifier(request.getSortOption()))
                 .fetch();
 
@@ -58,7 +58,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
 
         return new PageImpl<>(
                 data,
-                PageRequest.of(request.getPage(), request.getValidatedSize()),
+                PageRequest.of(request.getPage(), request.getSize()),
                 total != null ? total : 0L
         );
     }

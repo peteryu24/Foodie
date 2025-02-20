@@ -51,7 +51,6 @@ public class Item extends BaseEntity {
         this.description = description;
     }
 
-
     public void updateItem(String name, BigDecimal price, String description, ItemStatus status) {
         this.name = name;
         this.price = price;
