@@ -43,11 +43,9 @@ public class GeminiApiRequestDto {
         }
     }
 
-    public static GeminiApiRequestDto of(String text) {
+    public static GeminiApiRequestDto from(String text) {
         return GeminiApiRequestDto.builder()
                 .contents(List.of(Content.from(text)))
                 .build();
     }
 }
-
-
