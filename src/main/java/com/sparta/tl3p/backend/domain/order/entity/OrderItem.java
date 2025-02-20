@@ -9,7 +9,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
 @Entity
 @Table(name = "p_order_item")
 @Getter
@@ -38,13 +37,11 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    // 주문 아이템 생성 – OrderItemRequestDto와 Item을 이용
-    public static OrderItem createOrderItem(OrderItemRequestDto dto, Item item) {
-        return OrderItem.builder()
-                .orderItemId(UUID.randomUUID())
-                .item(item)
-                .quantity(dto.getQuantity())
-                .price(item.getPrice().multiply(BigDecimal.valueOf(dto.getQuantity())))
-                .build();
+    // OrderItemRequestDto와 Item을 이용하여 OrderItem을 생성하는 생성자
+    public OrderItem(OrderItemRequestDto dto, Item item) {
+        this.orderItemId = UUID.randomUUID();
+        this.item = item;
+        this.quantity = dto.getQuantity();
+        this.price = item.getPrice().multiply(BigDecimal.valueOf(dto.getQuantity()));
     }
 }

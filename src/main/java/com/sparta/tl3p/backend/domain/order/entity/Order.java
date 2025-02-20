@@ -9,7 +9,6 @@ import com.sparta.tl3p.backend.domain.order.enums.OrderType;
 import com.sparta.tl3p.backend.domain.order.enums.PaymentMethod;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.payment.entity.Payment;
-import com.sparta.tl3p.backend.domain.review.entity.Review;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +17,6 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 @Entity
 @Table(name = "p_order")
 @Getter
@@ -30,7 +28,8 @@ public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @Column(name = "order_id")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "order_id", updatable = false, nullable = false)
     private UUID orderId;
 
     @Enumerated(EnumType.STRING)
@@ -67,11 +66,8 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Review review;
-
+    // 생성자에서는 orderId를 직접 할당하지 않음.
     public Order(OrderRequestDto dto, Member member, Store store) {
-        this.orderId = UUID.randomUUID();
         this.orderType = dto.getOrderType();
         this.paymentMethod = dto.getPaymentMethod();
         this.deliveryAddress = dto.getDeliveryAddress();

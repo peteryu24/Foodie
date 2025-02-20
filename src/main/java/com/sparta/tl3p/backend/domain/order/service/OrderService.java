@@ -49,16 +49,13 @@ public class OrderService {
         Store store = storeRepository.findById(dto.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-        int totalAmount = 0;
+        BigDecimal totalAmount = BigDecimal.ZERO;
         if (dto.getItems() != null && !dto.getItems().isEmpty()) {
             for (var itemDto : dto.getItems()) {
                 Item item = itemRepository.findById(itemDto.getItemId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
-                totalAmount += item.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())).intValue();
+                totalAmount = totalAmount.add(item.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())));
             }
-        }
-        if (totalAmount == 0) {
-            totalAmount = 10000;
         }
 
         Order order = new Order(dto, member, store);
@@ -68,7 +65,7 @@ public class OrderService {
             List<OrderItem> orderItems = dto.getItems().stream().map(itemDto -> {
                 Item item = itemRepository.findById(itemDto.getItemId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
-                return OrderItem.createOrderItem(itemDto, item);
+                return new OrderItem(itemDto, item);
             }).collect(Collectors.toList());
             order.setOrderItems(orderItems);
         }
@@ -93,7 +90,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         if (!order.getMember().getMemberId().equals(memberId)) {
-            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
         order.updateOrder(dto);
         Order updatedOrder = orderRepository.save(order);
@@ -105,7 +102,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         if (!order.getMember().getMemberId().equals(memberId)) {
-            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
         order.cancelOrder();
         Order canceledOrder = orderRepository.save(order);
@@ -117,7 +114,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         if (!order.getMember().getMemberId().equals(memberId)) {
-            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
         return new OrderDetailResponseDto(order);
     }
@@ -133,7 +130,7 @@ public class OrderService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         if (!store.getMember().getMemberId().equals(memberId)) {
-            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
         List<Order> orders = orderRepository.findByStoreStoreId(storeId);
         return orders.stream().map(OrderResponseDto::new).collect(Collectors.toList());
