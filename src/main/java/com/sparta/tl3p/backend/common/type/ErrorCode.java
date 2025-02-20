@@ -14,6 +14,7 @@ public enum ErrorCode {
     STORE_NOT_FOUND("S-001", "Store Not Found"),
     // Review
     REVIEW_NOT_FOUND("R-001", "Review Not Found"),
+    REVIEW_ALREADY_DELETED("R-002", "Review Already Deleted"),
     // Item
     ITEM_NOT_FOUND("I-001", "Item Not Found"),
     // Order

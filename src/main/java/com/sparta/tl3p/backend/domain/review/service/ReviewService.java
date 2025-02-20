@@ -6,6 +6,7 @@ import com.sparta.tl3p.backend.domain.order.entity.Order;
 import com.sparta.tl3p.backend.domain.order.repository.OrderRepository;
 import com.sparta.tl3p.backend.domain.review.dto.ReviewResponseDto;
 import com.sparta.tl3p.backend.domain.review.entity.Review;
+import com.sparta.tl3p.backend.domain.review.entity.ReviewStatus;
 import com.sparta.tl3p.backend.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,7 @@ public class ReviewService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        Review review = new Review();
-        review.createReview(content, score, order);
-
+        Review review = Review.createReview(content, score, order);
         reviewRepository.save(review);
     }
 
@@ -47,7 +46,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public ReviewResponseDto findReview(UUID reviewId) {
-        Review review = reviewRepository.findById(reviewId)
+        Review review = reviewRepository.findByIdAndNotInReviewStatus(reviewId, ReviewStatus.DELETED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
         return new ReviewResponseDto(review);
     }
@@ -56,6 +55,11 @@ public class ReviewService {
     public void hideReview(UUID reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+
+        if (review.getStatus() == ReviewStatus.DELETED) {
+            throw new BusinessException(ErrorCode.REVIEW_ALREADY_DELETED);
+        }
+
         review.hideReview();
     }
 
@@ -63,6 +67,11 @@ public class ReviewService {
     public void deleteReview(UUID reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+
+        if (review.getStatus() == ReviewStatus.DELETED) {
+            throw new BusinessException(ErrorCode.REVIEW_ALREADY_DELETED);
+        }
+
         reviewRepository.delete(review);
     }
 
