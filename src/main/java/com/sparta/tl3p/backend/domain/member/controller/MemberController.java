@@ -1,8 +1,9 @@
 package com.sparta.tl3p.backend.domain.member.controller;
 
+import com.sparta.tl3p.backend.domain.member.dto.LoginRequestDto;
+import com.sparta.tl3p.backend.domain.member.dto.LoginResponseDto;
 import com.sparta.tl3p.backend.domain.member.dto.MemberRequestDto;
 import com.sparta.tl3p.backend.domain.member.dto.MemberResponseDto;
-import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,18 @@ public class MemberController {
     public ResponseEntity<List<MemberResponseDto>> getAllMembers(){
         List<MemberResponseDto> members = memberService.getAllMembers();
         return ResponseEntity.ok(members);
+    }
+
+    // 로그인
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto requestDto){
+        return  ResponseEntity.ok(memberService.login(requestDto));
+    }
+
+    //로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        memberService.logout(token);
+        return ResponseEntity.ok("로그아웃 되었습니다.");
     }
 }
