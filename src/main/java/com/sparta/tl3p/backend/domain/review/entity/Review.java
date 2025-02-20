@@ -55,7 +55,7 @@ public class Review extends BaseEntity {
                 .order(order)
                 .build();
         review.store = order.getStore();
-        order.setReview(review);  // 양방향 연관관계 처리
+//        order.setReview(review);  // 양방향 연관관계 처리
         return review;
     }
 

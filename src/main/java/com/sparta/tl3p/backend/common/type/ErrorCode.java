@@ -38,7 +38,9 @@ public enum ErrorCode {
     API_RESPONSE_PARSE_ERROR("A-005", "API Response Parse Error"),
 
     // Unexpected Exception
-    UNEXPECTED_ERROR("D-001", "Unexpected error ");
+    UNEXPECTED_ERROR("D-001", "Unexpected error "),
+    // Unauthorized
+    ACCESS_DENIED("D-002", "Access Denied"),;
 
 
     private final String code;

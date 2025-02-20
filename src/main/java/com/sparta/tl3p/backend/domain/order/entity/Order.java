@@ -9,7 +9,6 @@ import com.sparta.tl3p.backend.domain.order.enums.OrderType;
 import com.sparta.tl3p.backend.domain.order.enums.PaymentMethod;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.payment.entity.Payment;
-import com.sparta.tl3p.backend.domain.review.entity.Review;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +17,6 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 @Entity
 @Table(name = "p_order")
 @Getter
@@ -30,7 +28,8 @@ public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @Column(name = "order_id")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "order_id", updatable = false, nullable = false)
     private UUID orderId;
 
     @Enumerated(EnumType.STRING)
@@ -67,28 +66,22 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Review review;
-
-    // 주문 생성 – OrderRequestDto, Member, Store를 이용해 주문 생성
-    public static Order createOrder(OrderRequestDto dto, Member member, Store store) {
-        return Order.builder()
-                .orderId(UUID.randomUUID())
-                .orderType(dto.getOrderType())
-                .paymentMethod(dto.getPaymentMethod())
-                .deliveryAddress(dto.getDeliveryAddress())
-                .storeRequest(dto.getStoreRequest())
-                .status(DataStatus.CREATED)
-                .member(member)
-                .store(store)
-                .build();
+    // 생성자에서는 orderId를 직접 할당하지 않음.
+    public Order(OrderRequestDto dto, Member member, Store store) {
+        this.orderType = dto.getOrderType();
+        this.paymentMethod = dto.getPaymentMethod();
+        this.deliveryAddress = dto.getDeliveryAddress();
+        this.storeRequest = dto.getStoreRequest();
+        this.status = DataStatus.CREATED;
+        this.member = member;
+        this.store = store;
+        this.orderItems = new ArrayList<>();
     }
 
     // 주문 수정 – storeRequest(및 필요시 주문 아이템 갱신) 처리
     public void updateOrder(OrderUpdateRequestDto dto) {
         this.storeRequest = dto.getStoreRequest();
         this.status = DataStatus.UPDATED;
-        // 주문 아이템 업데이트 로직을 추가할 수 있음 (예: 기존 아이템 초기화 후 재등록)
     }
 
     // 주문 취소 처리
