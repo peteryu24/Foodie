@@ -1,4 +1,4 @@
-package com.sparta.tl3p.backend.domain.item.entity;
+package com.sparta.tl3p.backend.domain.item.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

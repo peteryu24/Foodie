@@ -1,5 +1,6 @@
 package com.sparta.tl3p.backend.domain.member.dto;
 
+import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ public class MemberRequestDto {
     @NotBlank(message = "이메일은 필수 입력 항목입니다.")
     private String email;
     private String nickname;
-    private String address;
+    private Address address;
     private Role role;
 
 }
