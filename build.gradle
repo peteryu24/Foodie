@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+	// SpringDoc OpenAPI (Swagger)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+
 	// H2 Database
 	testImplementation 'com.h2database:h2:2.2.224'
 
