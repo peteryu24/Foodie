@@ -148,8 +148,8 @@ public class OrderService {
             totalAmount = 10000;
         }
 
-        // 주문 엔티티 생성 (주문 아이템 처리 등은 별도 처리)
-        Order order = Order.createOrder(dto, member, store);
+        // 일반 생성자를 사용해 주문 엔티티 생성 (주문 아이템 처리 등은 별도 처리)
+        Order order = new Order(dto, member, store);
         order.setCreatedAt(LocalDateTime.now());
 
         // 주문 요청 시 전달된 items를 OrderItem 엔티티로 변환하여 order에 설정

@@ -70,25 +70,22 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review;
 
-    // 주문 생성 – OrderRequestDto, Member, Store를 이용해 주문 생성
-    public static Order createOrder(OrderRequestDto dto, Member member, Store store) {
-        return Order.builder()
-                .orderId(UUID.randomUUID())
-                .orderType(dto.getOrderType())
-                .paymentMethod(dto.getPaymentMethod())
-                .deliveryAddress(dto.getDeliveryAddress())
-                .storeRequest(dto.getStoreRequest())
-                .status(DataStatus.CREATED)
-                .member(member)
-                .store(store)
-                .build();
+    public Order(OrderRequestDto dto, Member member, Store store) {
+        this.orderId = UUID.randomUUID();
+        this.orderType = dto.getOrderType();
+        this.paymentMethod = dto.getPaymentMethod();
+        this.deliveryAddress = dto.getDeliveryAddress();
+        this.storeRequest = dto.getStoreRequest();
+        this.status = DataStatus.CREATED;
+        this.member = member;
+        this.store = store;
+        this.orderItems = new ArrayList<>();
     }
 
     // 주문 수정 – storeRequest(및 필요시 주문 아이템 갱신) 처리
     public void updateOrder(OrderUpdateRequestDto dto) {
         this.storeRequest = dto.getStoreRequest();
         this.status = DataStatus.UPDATED;
-        // 주문 아이템 업데이트 로직을 추가할 수 있음 (예: 기존 아이템 초기화 후 재등록)
     }
 
     // 주문 취소 처리
