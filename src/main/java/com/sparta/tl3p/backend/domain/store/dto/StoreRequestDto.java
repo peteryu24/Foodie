@@ -31,7 +31,7 @@ public class StoreRequestDto {
 
     private List<String> categoryIds;
 
-    // ✅ 테스트용 생성자 추가
+    // 테스트용
     public StoreRequestDto(String name, String content) {
         this.name = name;
         this.content = content;
