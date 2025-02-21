@@ -9,7 +9,7 @@ import com.sparta.tl3p.backend.domain.order.dto.OrderResponseDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -28,12 +28,11 @@ public class OrderController {
 
     /**
      * 주문 생성 API
-     * - Authentication을 통해 로그인한 회원의 ID를 획득하여 주문 생성
+     * - @AuthenticationPrincipal을 통해 로그인한 회원의 ID(memberId)를 주입받아 주문을 생성합니다.
      */
     @PostMapping
     public ResponseEntity<SuccessResponseDto> createOrder(@RequestBody OrderRequestDto request,
-                                                          Authentication authentication) {
-        Long memberId = Long.parseLong(authentication.getName());
+                                                          @AuthenticationPrincipal Long memberId) {
         OrderResponseDto response = orderService.createOrder(request, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -46,18 +45,17 @@ public class OrderController {
 
     /**
      * 주문 수정 API
-     * - 주문 ID와 수정 요청 데이터를 받아 주문을 수정합니다.
+     * - 고객은 주문 생성 후 5분 이내에 수정 가능하며, 주문 상태(status) 변경은 불가능합니다.
      */
     @PutMapping("/{orderId}")
     public ResponseEntity<SuccessResponseDto> updateOrder(@PathVariable String orderId,
                                                           @RequestBody OrderUpdateRequestDto request,
-                                                          Authentication authentication) {
-        Long memberId = Long.parseLong(authentication.getName());
+                                                          @AuthenticationPrincipal Long memberId) {
         OrderResponseDto response = orderService.updateOrder(UUID.fromString(orderId), request, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)
-                        .message("주문 수정")
+                        .message("주문 수정 완료")
                         .data(response)
                         .build()
         );
@@ -65,18 +63,17 @@ public class OrderController {
 
     /**
      * 주문 취소 API
-     * - 주문 ID와 취소 요청 데이터를 받아 주문 취소를 진행합니다.
+     * - 고객은 주문 생성 후 5분 이내에 취소가 가능합니다.
      */
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<SuccessResponseDto> cancelOrder(@PathVariable String orderId,
                                                           @RequestBody OrderCancelRequestDto request,
-                                                          Authentication authentication) {
-        Long memberId = Long.parseLong(authentication.getName());
+                                                          @AuthenticationPrincipal Long memberId) {
         OrderResponseDto response = orderService.cancelOrder(UUID.fromString(orderId), request, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)
-                        .message("주문 취소")
+                        .message("주문 취소 완료")
                         .data(response)
                         .build()
         );
@@ -84,12 +81,10 @@ public class OrderController {
 
     /**
      * 주문 상세 조회 API
-     * - 주문 ID를 통해 해당 주문의 상세 정보를 반환합니다.
      */
     @GetMapping("/{orderId}")
     public ResponseEntity<SuccessResponseDto> getOrderDetail(@PathVariable String orderId,
-                                                             Authentication authentication) {
-        Long memberId = Long.parseLong(authentication.getName());
+                                                             @AuthenticationPrincipal Long memberId) {
         OrderDetailResponseDto detail = orderService.getOrderDetail(UUID.fromString(orderId), memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -104,7 +99,7 @@ public class OrderController {
      * 주문 조회 및 검색 API
      * - memberId가 제공되면 회원별 주문 조회
      * - storeId가 제공되면 해당 가게의 주문 조회 (가게 소유자 검증 포함)
-     * - 추가로 storeName 또는 productName이 제공되면 QueryDSL 기반 검색을 수행합니다.
+     * - storeName 또는 productName이 제공되면 검색 처리
      */
     @GetMapping
     public ResponseEntity<SuccessResponseDto> getOrders(
@@ -112,7 +107,7 @@ public class OrderController {
             @RequestParam(required = false) UUID storeId,
             @RequestParam(required = false) String storeName,
             @RequestParam(required = false) String productName,
-            Authentication authentication) {
+            @AuthenticationPrincipal Long authMemberId) {
 
         if (memberId != null && (storeName != null || productName != null)) {
             List<OrderResponseDto> orders = orderService.searchOrders(memberId, storeName, productName);
@@ -133,8 +128,6 @@ public class OrderController {
                             .build()
             );
         } else if (storeId != null) {
-            // 가게 주문 조회 시, 로그인한 회원이 가게의 소유자인지 검증
-            Long authMemberId = Long.parseLong(authentication.getName());
             List<OrderResponseDto> orders = orderService.getStoreOrders(storeId, authMemberId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()

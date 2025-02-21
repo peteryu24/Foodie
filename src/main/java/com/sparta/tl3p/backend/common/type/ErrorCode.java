@@ -22,6 +22,7 @@ public enum ErrorCode {
     ITEM_NOT_FOUND("I-001", "Item Not Found"),
     // Order
     ORDER_NOT_FOUND("O-001", "Order Not Found"),
+    ORDER_TIME_OUT("O-002", "Order Time Out"),
     // Payment
     PAYMENT_NOT_FOUND("P-001", "Payment Not Found"),
     PAYMENT_FAILED("P-002", "Payment Failed"),

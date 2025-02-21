@@ -5,6 +5,7 @@ import com.sparta.tl3p.backend.common.type.ErrorCode;
 import com.sparta.tl3p.backend.domain.item.entity.Item;
 import com.sparta.tl3p.backend.domain.item.repository.ItemRepository;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
+import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.member.repository.MemberRepository;
 import com.sparta.tl3p.backend.domain.order.dto.OrderCancelRequestDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderDetailResponseDto;
@@ -89,9 +90,33 @@ public class OrderService {
     public OrderResponseDto updateOrder(UUID orderId, OrderUpdateRequestDto dto, Long memberId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (!order.getMember().getMemberId().equals(memberId)) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        // 역할에 따른 접근 제어
+        if (member.getRole() == Role.CUSTOMER) {
+            // 고객은 자신의 주문만 수정 가능
+            if (!order.getMember().getMemberId().equals(memberId)) {
+                throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            }
+            // 주문 생성 후 5분 이내여야 함
+            if (order.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
+                throw new BusinessException(ErrorCode.ORDER_TIME_OUT);
+            }
+        } else if (member.getRole() == Role.OWNER) {
+            // 가게주인은 해당 주문이 자신 소유의 가게에 속해있는지 확인
+            Store store = order.getStore();
+            if (!store.getMember().getMemberId().equals(memberId)) {
+                throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            }
+            // 가게주인은 별도 시간 제한 없이 수정 가능 (필요시 추가 검증 가능)
+        } else if (member.getRole() == Role.MANAGER || member.getRole() == Role.MASTER) {
+            // 관리자/최고관리자는 전체 접근 허용
+        } else {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
+
+        // 실제 업데이트 진행 (Order 엔티티 내부에서 업데이트 필드에 대한 처리)
         order.updateOrder(dto);
         Order updatedOrder = orderRepository.save(order);
         return new OrderResponseDto(updatedOrder);
@@ -101,9 +126,31 @@ public class OrderService {
     public OrderResponseDto cancelOrder(UUID orderId, OrderCancelRequestDto dto, Long memberId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (!order.getMember().getMemberId().equals(memberId)) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        // 역할에 따른 취소 제어
+        if (member.getRole() == Role.CUSTOMER) {
+            // 고객은 자신의 주문만 취소 가능
+            if (!order.getMember().getMemberId().equals(memberId)) {
+                throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            }
+            // 주문 생성 후 5분 이내여야 취소 가능
+            if (order.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
+                throw new BusinessException(ErrorCode.ORDER_TIME_OUT);
+            }
+        } else if (member.getRole() == Role.OWNER) {
+            // 가게주인의 경우 주문이 해당 가게에 속해있는지 확인
+            Store store = order.getStore();
+            if (!store.getMember().getMemberId().equals(memberId)) {
+                throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            }
+        } else if (member.getRole() == Role.MANAGER || member.getRole() == Role.MASTER) {
+            // 관리자/최고관리자는 전체 접근 허용
+        } else {
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
+
         order.cancelOrder();
         Order canceledOrder = orderRepository.save(order);
         return new OrderResponseDto(canceledOrder);
@@ -113,8 +160,18 @@ public class OrderService {
     public OrderDetailResponseDto getOrderDetail(UUID orderId, Long memberId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (!order.getMember().getMemberId().equals(memberId)) {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        // 고객은 자신의 주문만 조회, 가게주인은 가게 주문만, 관리자/최고관리자는 전체 접근 허용
+        if (member.getRole() == Role.CUSTOMER) {
+            if (!order.getMember().getMemberId().equals(memberId)) {
+                throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            }
+        } else if (member.getRole() == Role.OWNER) {
+            Store store = order.getStore();
+            if (!store.getMember().getMemberId().equals(memberId)) {
+                throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            }
         }
         return new OrderDetailResponseDto(order);
     }
