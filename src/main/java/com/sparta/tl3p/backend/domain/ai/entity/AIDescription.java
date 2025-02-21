@@ -2,6 +2,7 @@ package com.sparta.tl3p.backend.domain.ai.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
 import com.sparta.tl3p.backend.domain.item.entity.Item;
+import com.sparta.tl3p.backend.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,25 +32,17 @@ public class AIDescription extends BaseEntity {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    // TODO: 연관관계 재설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
-    //    @JoinColumn(name = "member_id", nullable = false)
-    //    private Member member;
-
-    //    @Builder
-    //    public AIDescription(String prompt, String response, Item item, Member member) {
-    //        this.prompt = prompt;
-    //        this.response = response;
-    //        this.item = item;
-    //        this.member = member;
-    //    }
 
     @Builder
-    public AIDescription(String prompt, String response, Item item) {
+    public AIDescription(String prompt, String response, Item item, Member member) {
         this.prompt = prompt;
         this.response = response;
         this.item = item;
+        this.member = member;
     }
 
     public void updateDescription(String prompt, String response) {
