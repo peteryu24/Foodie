@@ -42,10 +42,7 @@ public class AIDescriptionService {
                 .prompt(prompt)
                 .response(aiResponse)
                 .item(item)
-
-                // TODO: member_id
-
-
+                .member(item.getStore().getMember())
                 .build();
 
         aiDescriptionRepository.save(aiDescription);
