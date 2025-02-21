@@ -2,14 +2,20 @@ package com.sparta.tl3p.backend.common.util;
 
 import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ErrorCode;
+import com.sparta.tl3p.backend.domain.member.entity.CustomUserDetails;
+import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.member.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -72,8 +78,9 @@ public class JwtTokenProvider {
     public Long getMemberIdFromToken(String token) {
 
         try {
-            Claims claims = Jwts.parser()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
             return Long.valueOf(claims.getSubject());
@@ -82,19 +89,32 @@ public class JwtTokenProvider {
         }
     }
 
-    public void validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
+            return true;
         } catch (Exception e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
-            throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
+            return false;
         }
     }
 
 
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer " 이후의 문자열 반환 (실제 토큰 부분)
+        }
+        return null;
+    }
+
+
+    public Authentication getAuthentication(UserDetails userDetails) {
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
 
 
 }

@@ -29,19 +29,19 @@ public class MemberController {
 
     //회원조회
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDto> getMemberById(@PathVariable Long memberId){
+    public ResponseEntity<MemberResponseDto> getMemberById(@PathVariable("memberId") Long memberId){
         return ResponseEntity.ok(memberService.getMemberById(memberId));
     }
 
     //회원정보수정
     @PutMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long memberId, @RequestBody MemberRequestDto requestDto){
+    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable("memberId") Long memberId, @RequestBody MemberRequestDto requestDto){
         return ResponseEntity.ok(memberService.updateMember(memberId, requestDto));
     }
 
     // 회원탈퇴
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<String> deleteMember(@PathVariable Long memberId){
+    public ResponseEntity<String> deleteMember(@PathVariable("memberId") Long memberId){
         memberService.deleteMember(memberId);
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
