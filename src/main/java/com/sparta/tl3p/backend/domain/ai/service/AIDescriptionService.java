@@ -1,6 +1,5 @@
 package com.sparta.tl3p.backend.domain.ai.service;
 
-import com.sparta.tl3p.backend.common.config.ApiConfig;
 import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ErrorCode;
 import com.sparta.tl3p.backend.domain.ai.dto.AIDescriptionRequestDto;
@@ -12,6 +11,7 @@ import com.sparta.tl3p.backend.domain.ai.repository.AIDescriptionRepository;
 import com.sparta.tl3p.backend.domain.item.entity.Item;
 import com.sparta.tl3p.backend.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +24,16 @@ import java.net.URI;
 @Service
 @RequiredArgsConstructor
 public class AIDescriptionService {
+
+    @Value("${api.gemini.key}")
+    private String GEMINI_API_KEY;
+
+    @Value("${api.gemini.url}")
+    private String GEMINI_API_URL;
+
     private final AIDescriptionRepository aiDescriptionRepository;
     private final ItemRepository          itemRepository;
     private final RestTemplate            restTemplate;
-    private final ApiConfig               apiConfig;
 
     @Transactional
     public AIDescriptionResponseDto generateDescription(AIDescriptionRequestDto request) {
@@ -58,8 +64,8 @@ public class AIDescriptionService {
     }
 
     private String callAIApi(String prompt) {
-        URI url = UriComponentsBuilder.fromUriString(apiConfig.getGeminiApiUrl())
-                .queryParam("key", apiConfig.getGeminiApiKey())
+        URI url = UriComponentsBuilder.fromUriString(GEMINI_API_KEY)
+                .queryParam("key", GEMINI_API_URL)
                 .build()
                 .toUri();
 

@@ -11,6 +11,7 @@ import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
+    @Value("${jwt.refresh-token-validity}")
+    private Long REFRESH_EXPIRATION;
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -112,7 +116,7 @@ public class MemberService {
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
 
 
-        redisService.saveRefreshToken(member.getMemberId(), refreshToken, 7 * 24 * 60 * 60 * 1000L);// 7일
+        redisService.saveRefreshToken(member.getMemberId(), refreshToken, REFRESH_EXPIRATION);// 7일
 
         return new LoginResponseDto(accessToken, refreshToken);
     }
