@@ -2,8 +2,6 @@ package com.sparta.tl3p.backend.common.util;
 
 import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ErrorCode;
-import com.sparta.tl3p.backend.domain.member.entity.CustomUserDetails;
-import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.member.service.RedisService;
 import io.jsonwebtoken.Claims;
@@ -26,15 +24,18 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
+    @Value("${jwt.access-header}")
+    private String ACCESS_HEADER;
+
     private final SecretKey secretKey;
-    private final long accessTokenValidity;
-    private final long refreshTokenValidity;
+    private final Long accessTokenValidity;
+    private final Long refreshTokenValidity;
     private final RedisService redisService;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-validity}") long accessTokenValidity,
-            @Value("${jwt.refresh-token-validity}") long refreshTokenValidity,
+            @Value("${jwt.access-token-validity}") Long accessTokenValidity,
+            @Value("${jwt.refresh-token-validity}") Long refreshTokenValidity,
             RedisService redisService) {
         System.out.println("JWT SECRET :" + secret);
 
@@ -104,7 +105,7 @@ public class JwtTokenProvider {
 
 
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+        String bearerToken = request.getHeader(ACCESS_HEADER);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7); // "Bearer " 이후의 문자열 반환 (실제 토큰 부분)
         }
