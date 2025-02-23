@@ -29,18 +29,8 @@ pipeline {
     stages {
         stage('Get Merge Request and preBuildMerge') {
             steps {
-                cleanWs()
-                script {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "origin/$env.GITHUB_BRANCH"]],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'PreBuildMerge', options: [mergeRemote: 'origin', mergeTarget: '$githubTargetBranch']]],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [[credentialsId: 'github_token', url: '$githubCloneUrl']]
-                    ])
-                }
-
+                git branch: '$githubTargetBranch', credentialsId: 'github_token',
+                url: 'https://github.com/haisley77/tl1p'
             }
         }
 
