@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -22,6 +24,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER','MASTER')")
     public ResponseEntity<SuccessResponseDto> getAllItems(
             @ModelAttribute @Valid ItemSearchRequestDto request
     ) {
@@ -34,7 +37,10 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<SuccessResponseDto> getItem(@PathVariable UUID itemId) {
+    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER','MASTER')")
+    public ResponseEntity<SuccessResponseDto> getItem(
+            @PathVariable UUID itemId
+    ) {
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 상세 조회 성공")
@@ -43,34 +49,45 @@ public class ItemController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('OWNER')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<SuccessResponseDto> createItem(
-            @Valid @RequestBody ItemCreateRequestDto request
+            @Valid @RequestBody ItemCreateRequestDto request,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 등록 성공")
-                .data(itemService.createItem(request))
+                .data(itemService.createItem(request, memberId))
                 .build());
     }
 
     @PutMapping("/{itemId}")
-    @PreAuthorize("hasAuthority('OWNER')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<SuccessResponseDto> updateItem(
             @PathVariable UUID itemId,
-            @Valid @RequestBody ItemUpdateRequestDto request
+            @Valid @RequestBody ItemUpdateRequestDto request,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 수정 성공")
-                .data(itemService.updateItem(itemId, request))
+                .data(itemService.updateItem(itemId, request, memberId))
                 .build());
     }
 
     @DeleteMapping("/{itemId}")
-    @PreAuthorize("hasAuthority('OWNER')")
-    public ResponseEntity<SuccessResponseDto> deleteItem(@PathVariable UUID itemId) {
-        itemService.deleteItem(itemId);
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<SuccessResponseDto> deleteItem(
+            @PathVariable UUID itemId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+
+        itemService.deleteItem(itemId, memberId);
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 삭제 성공")
@@ -78,12 +95,17 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    @PreAuthorize("hasAuthority('OWNER')")
-    public ResponseEntity<SuccessResponseDto> hideItem(@PathVariable UUID itemId) {
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<SuccessResponseDto> hideItem(
+            @PathVariable UUID itemId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 숨김 성공")
-                .data(itemService.hideItem(itemId))
+                .data(itemService.hideItem(itemId, memberId))
                 .build());
     }
 }
