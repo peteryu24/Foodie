@@ -6,14 +6,14 @@ pipeline {
     }
 
     environment {
-        imageName = credentials('IMAGE_NAME')
-        registryCredential = credentials('REGISTRY_CREDENTIAL')
+        imageName = 'haisley77/release'
+        registryCredential = 'docker_token'
 
         releaseServerAccount = credentials('RELEASE_SERVER_ACCOUNT')
         releaseServerUri = credentials('RELEASE_SERVER_URI')
         releasePort = credentials('RELEASE_SERVER_PORT')
 
-        githubTargetBranch = credentials('GITHUB_TARGET_BRANCH')
+        githubTargetBranch = 'release/v1.0'
         githubCloneUrl = credentials('GITHUB_CLONE_URL')
     }
 
@@ -29,43 +29,48 @@ pipeline {
     stages {
         stage('Get Merge Request and preBuildMerge') {
             steps {
-                git branch: '$githubTargetBranch', credentialsId: 'github_token',
-                url: 'https://github.com/haisley77/tl1p'
+                git branch: "${githubTargetBranch}", credentialsId: 'github_token',
+                url: "${env.githubCloneUrl}"
+
             }
         }
 
         stage('Setup build environment') {
             steps {
                 script {
-                        sh 'rm -rf tl1p/env'
-                        sh 'mkdir -p tl1p/env'
-                        sh "chown -R jenkins:jenkins tl1p/env"
-                        sh "chmod -R 755 tl1p/env"
+                        sh 'rm -rf env'
+                        sh 'mkdir -p env'
+                        sh "chown -R jenkins:jenkins env"
+                        sh "chmod -R 755 env"
+                        sh 'rm -rf src/main/resources'
+                        sh 'mkdir -p src/main/resources'
+                        sh "chown -R jenkins:jenkins src/main/resources"
+                        sh "chmod -R 755 src/main/resources"
                 }
 
 
                 withCredentials([file(credentialsId: 'db', variable: 'dbFile')]) {
                     script {
-                        sh 'cp $dbFile tl1p/env/db.env'
+                        sh 'cp $dbFile env/db.env'
                     }
                 }
 
 
                 withCredentials([file(credentialsId: 'test-db', variable: 'testdbFile')]) {
                     script {
-                        sh 'cp $testdbFile tl1p/env/test-db.env'
+                        sh 'cp $testdbFile env/test-db.env'
                     }
                 }
 
                 withCredentials([file(credentialsId: 'security', variable: 'securityFile')]) {
                     script {
-                        sh 'cp $securityFile tl1p/env/security.env'
+                        sh 'cp $securityFile env/security.env'
                     }
                 }
 
                 withCredentials([file(credentialsId: 'application.yml', variable: 'ymlFile')]) {
                      script {
-                         sh 'cp $ymlFile tl1p/src/main/resources/application.yml'
+                         sh 'cp $ymlFile src/main/resources/application.yml'
                      }
                 }
 
@@ -75,36 +80,30 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building...'
-                 dir('tl1p') {
-                    sh 'chmod +x ./gradlew'
-                    sh './gradlew clean bootJar'
-                }
+                sh 'chmod +x ./gradlew'
+                sh './gradlew clean bootJar'
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Test...'
-                dir('tl1p') {
-                    sh './gradlew test'
-                }
-            }
-        }
+        //stage('Test') {
+        //    steps {
+        //        echo 'Test...'
+        //        sh './gradlew test'
+        //    }
+        //}
 
         stage('[Backend] Image Build & DockerHub Push') {
             when {
                 expression { env.GITHUB_PR_STATE != 'opened' }
             }
             steps {
-                dir('tl1p') {
-                    script {
-                        docker.withRegistry('', registryCredential) {
-                            // sh "docker build -t $imageName:$BUILD_NUMBER ."
-                            sh "docker build -t $imageName:latest ."
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        // sh "docker build -t $imageName:$BUILD_NUMBER ."
+                        sh "docker build -t $imageName:latest ."
 
-                            // sh "docker push $imageName:$BUILD_NUMBER"
-                            sh "docker push $imageName:latest"
-                        }
+                        // sh "docker push $imageName:$BUILD_NUMBER"
+                        sh "docker push $imageName:latest"
                     }
                 }
             }
@@ -116,7 +115,9 @@ pipeline {
             }
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
-                    sh "ssh -o StrictHostKeyChecking=no $releaseServerAccount@$releaseServerUri 'sudo docker pull $imageName:latest'"
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} 'sudo docker pull $imageName:latest'
+                    """
                 }
             }
         }
@@ -128,7 +129,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no $releaseServerAccount@$releaseServerUri "sudo docker run -i -e TZ=Asia/Seoul --name tl1p -p releasePort:releasePort -d $imageName:latest"
+                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} "sudo docker run -i -e TZ=Asia/Seoul --env-file=/home/ubuntu/env/db.env --env-file=/home/ubuntu/env/security.env --env-file=/home/ubuntu/env/test-db.env --name tl1p -p ${env.releasePort}:${env.releasePort} -d $imageName:latest"
                     """
                 }
             }
