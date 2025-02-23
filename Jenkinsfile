@@ -73,6 +73,12 @@ pipeline {
                     }
                 }
 
+                withCredentials([file(credentialsId: 'application.yml', variable: 'ymlFile')]) {
+                     script {
+                         sh 'cp $ymlFile tl1p/src/main/resources/application.yml'
+                     }
+                }
+
             }
         }
 
@@ -132,7 +138,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no $releaseServerAccount@$releaseServerUri "sudo docker run -i -e TZ=Asia/Seoul --env-file=/home/ubuntu/env/.env --name tl1p --network tl1p-network -p releasePort:releasePort -d $imageName:latest"
+                        ssh -o StrictHostKeyChecking=no $releaseServerAccount@$releaseServerUri "sudo docker run -i -e TZ=Asia/Seoul --name tl1p -p releasePort:releasePort -d $imageName:latest"
                     """
                 }
             }
