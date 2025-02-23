@@ -4,13 +4,17 @@ import com.sparta.tl3p.backend.domain.item.enums.ItemStatus;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemUpdateRequestDto {
     @Size(min = 1, max = 100, message = "상품명은 1-100자 사이여야 합니다")
     private String itemName;
