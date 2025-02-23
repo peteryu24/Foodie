@@ -31,9 +31,9 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
             builder.and(item.name.containsIgnoreCase(request.getItemName()));
         }
 
-        //        if (request.getStoreId() != null) {
-        //            builder.and(item.store.id.eq(request.getStoreId()));
-        //        }
+        if (request.getStoreId() != null) {
+            builder.and(item.store.storeId.eq(request.getStoreId()));
+        }
 
         if (request.getMinPrice() != null) {
             builder.and(item.price.goe(request.getMinPrice()));
@@ -44,7 +44,7 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         }
 
         List<Item> data = queryFactory.selectFrom(item)
-                //                .leftJoin(item.store).fetchJoin()
+                .leftJoin(item.store).fetchJoin()
                 .where(builder)
                 .offset((long) request.getPage() * request.getSize())
                 .limit(request.getSize())
