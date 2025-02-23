@@ -29,8 +29,18 @@ pipeline {
     stages {
         stage('Get Merge Request and preBuildMerge') {
             steps {
-                git branch: '$githubTargetBranch', credentialsId: 'github_token',
-                url: 'https://github.com/haisley77/tl1p'
+                cleanWs()
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "origin/$env.GITHUB_BRANCH"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'PreBuildMerge', options: [mergeRemote: 'origin', mergeTarget: '$githubTargetBranch']]],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[credentialsId: 'github_token', url: '$githubCloneUrl']]
+                    ])
+                }
+
             }
         }
 
@@ -61,12 +71,6 @@ pipeline {
                     script {
                         sh 'cp $securityFile tl1p/env/security.env'
                     }
-                }
-
-                withCredentials([file(credentialsId: 'application.yml', variable: 'ymlFile')]) {
-                     script {
-                         sh 'cp $ymlFile tl1p/src/main/resources/application.yml'
-                     }
                 }
 
             }
@@ -128,7 +132,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no $releaseServerAccount@$releaseServerUri "sudo docker run -i -e TZ=Asia/Seoul --name tl1p -p releasePort:releasePort -d $imageName:latest"
+                        ssh -o StrictHostKeyChecking=no $releaseServerAccount@$releaseServerUri "sudo docker run -i -e TZ=Asia/Seoul --env-file=/home/ubuntu/env/.env --name tl1p --network tl1p-network -p releasePort:releasePort -d $imageName:latest"
                     """
                 }
             }
