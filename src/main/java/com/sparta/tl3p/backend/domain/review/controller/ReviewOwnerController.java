@@ -22,7 +22,7 @@ public class ReviewOwnerController {
 
     @GetMapping
     public ResponseEntity<SuccessResponseDto> searchOwnerReviews(
-            @RequestParam(required = false, defaultValue = "") UUID storeId) {
+            @RequestParam(required = false) UUID storeId) {
 
         // todo: memberId 값에 UserDetails 값 넣어 주기
         List<ReviewResponseDto> responseDtos = reviewService.searchOwnerReviews(storeId,1L);
