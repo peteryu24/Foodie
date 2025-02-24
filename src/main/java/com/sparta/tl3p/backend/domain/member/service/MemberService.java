@@ -11,7 +11,6 @@ import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
 import com.sparta.tl3p.backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
-    @Value("${jwt.refresh-token-validity}")
-    private Long REFRESH_EXPIRATION;
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -57,8 +53,13 @@ public class MemberService {
 
     }
 
-    // 회원조회
-    public MemberResponseDto getMemberById(Long memberId) {
+    // 회원 단일조회
+    public MemberResponseDto getMemberById(Long memberId, String token) {
+        Long currentMemberId = getCurrentMemberId(token);
+        if (!currentMemberId.equals(memberId) && !isMaster(currentMemberId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         return new MemberResponseDto(member);
@@ -66,7 +67,14 @@ public class MemberService {
 
     // 회원정보 수정
     @Transactional
-    public MemberResponseDto updateMember(Long memberId, MemberRequestDto requestDto) {
+    public MemberResponseDto updateMember(Long memberId, MemberRequestDto requestDto, String token) {
+
+        Long currentMemberId = getCurrentMemberId(token);
+
+        if (!currentMemberId.equals(memberId) && !isMaster(currentMemberId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -86,11 +94,35 @@ public class MemberService {
     }
 
     // 회원탈퇴
-    public void deleteMember(Long memberId) {
+    public void deleteMember(Long memberId, String token) {
+
+        Long currentMemberId = getCurrentMemberId(token);
+
+        if (!currentMemberId.equals(memberId) && !isMaster(currentMemberId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         memberRepository.delete(member);
+    }
+
+    private boolean isMaster(Long memberId) {
+        return memberRepository.findById(memberId)
+                .map(member -> member.getRole().equals(Role.MASTER))
+                .orElse(false);
+    }
+
+    private Long getCurrentMemberId(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
+        }
+
+        // "Bearer " 제거 후 토큰 값만 추출
+        String pureToken = token.substring(7).trim();
+
+        return jwtTokenProvider.getMemberIdFromToken(pureToken);
     }
 
     // 회원 전체 조회
@@ -116,7 +148,7 @@ public class MemberService {
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
 
 
-        redisService.saveRefreshToken(member.getMemberId(), refreshToken, REFRESH_EXPIRATION);// 7일
+        redisService.saveRefreshToken(member.getMemberId(), refreshToken, 7 * 24 * 60 * 60 * 1000L);// 7일
 
         return new LoginResponseDto(accessToken, refreshToken);
     }
