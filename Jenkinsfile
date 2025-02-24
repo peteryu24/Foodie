@@ -28,7 +28,7 @@ pipeline {
 
 
     stages {
-        stage('Get Merge Request and preBuildMerge') {
+        stage('Git Clone') {
             steps {
                 git branch: "${githubTargetBranch}", credentialsId: 'github_token',
                 url: "${env.githubCloneUrl}"
