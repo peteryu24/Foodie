@@ -5,6 +5,7 @@ import com.sparta.tl3p.backend.common.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,14 +37,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        //                        .requestMatchers("/api/v1/members/signup").permitAll()
                         .requestMatchers("/api/v1/members/signup", "/api/v1/members/login").permitAll()  //수정
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // springdoc-openapi
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/members/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/members/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/members/{id}").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/members").hasAnyRole("MASTER", "MANAGER")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
-        System.out.println("[SecurityConfig] Security Filter Chain 설정 완료");
+
 
         return http.build();
     }

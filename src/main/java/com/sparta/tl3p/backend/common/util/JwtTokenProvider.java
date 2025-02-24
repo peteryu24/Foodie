@@ -118,4 +118,18 @@ public class JwtTokenProvider {
     }
 
 
+    private Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public String getUserRoleFromToken(String token) {
+        return extractClaims(token).get("role", String.class);
+    }
+
+
+
 }
