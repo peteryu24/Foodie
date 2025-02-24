@@ -24,7 +24,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     public ResponseEntity<SuccessResponseDto> createReview(
             @RequestBody ReviewCreationRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -39,7 +39,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}")
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     public ResponseEntity<SuccessResponseDto> updateReview(
             @PathVariable UUID reviewId,
             @RequestBody ReviewUpdateRequestDto requestDto,
@@ -56,7 +56,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER','ROLE_OWNER','ROLE_MANAGER')")
     public ResponseEntity<SuccessResponseDto> searchReviews(
             @RequestParam(required = false) UUID storeId,
             @RequestParam(required = false) String query,
@@ -73,7 +73,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}")
-    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER','ROLE_OWNER','ROLE_MANAGER')")
     public ResponseEntity<SuccessResponseDto> findReview(
             @PathVariable UUID reviewId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -88,7 +88,7 @@ public class ReviewController {
     }
 
     @PatchMapping("/{reviewId}")
-    @PreAuthorize("hasAnyAuthority('CUSTOMER','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER','ROLE_MANAGER')")
     public ResponseEntity<SuccessResponseDto> hideReview(
             @PathVariable UUID reviewId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
