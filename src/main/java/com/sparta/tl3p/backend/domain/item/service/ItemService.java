@@ -8,6 +8,7 @@ import com.sparta.tl3p.backend.domain.item.dto.ItemSearchRequestDto;
 import com.sparta.tl3p.backend.domain.item.dto.ItemUpdateRequestDto;
 import com.sparta.tl3p.backend.domain.item.entity.Item;
 import com.sparta.tl3p.backend.domain.item.repository.ItemRepository;
+import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import com.sparta.tl3p.backend.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +28,19 @@ public class ItemService {
     private final StoreRepository storeRepository;
 
     public ItemResponseDto getItem(UUID itemId) {
-        return ItemResponseDto.from(
-                itemRepository.findById(itemId)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND))
-        );
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
+
+        return ItemResponseDto.from(item);
     }
 
     @Transactional
-    public ItemResponseDto createItem(ItemCreateRequestDto request) {
+    public ItemResponseDto createItem(ItemCreateRequestDto request, Long memberId) {
 
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        validateItemAccess(store.getMember(), memberId);
 
         Item item = Item.builder()
                 .store(store)
@@ -50,8 +53,10 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemResponseDto updateItem(UUID id, ItemUpdateRequestDto request) {
+    public ItemResponseDto updateItem(UUID id, ItemUpdateRequestDto request, Long memberId) {
+
         Item item = findItemById(id);
+        validateItemAccess(item.getStore().getMember(), memberId);
 
         item.updateItem(
                 request.getItemName(),
@@ -63,18 +68,12 @@ public class ItemService {
         return ItemResponseDto.from(item);
     }
 
-
     @Transactional
-    public void deleteItem(UUID id) {
+    public void deleteItem(UUID id, Long memberId) {
         Item item = findItemById(id);
+        validateItemAccess(item.getStore().getMember(), memberId);
 
-        //TODO: 임시 코드
-        item.softDelete(1L);
-    }
-
-    private Item findItemById(UUID id) {
-        return itemRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
+        item.softDelete(memberId);
     }
 
     public Page<Item> getAllItems(ItemSearchRequestDto request) {
@@ -82,10 +81,27 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemResponseDto hideItem(UUID id) {
+    public ItemResponseDto hideItem(UUID id, Long memberId) {
         Item item = findItemById(id);
+        validateItemAccess(item.getStore().getMember(), memberId);
         item.hideItem();
 
         return ItemResponseDto.from(item);
+    }
+
+
+    private Item findItemById(UUID id) {
+        return itemRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
+    }
+
+    private void validateItemAccess(Member owner, Long memberId) {
+        if (owner == null || memberId == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        if (!owner.getMemberId().equals(memberId)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
     }
 }

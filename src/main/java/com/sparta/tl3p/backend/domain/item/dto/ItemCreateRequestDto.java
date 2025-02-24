@@ -1,6 +1,8 @@
 package com.sparta.tl3p.backend.domain.item.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +10,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemCreateRequestDto {
     @NotNull(message = "가게 ID는 필수입니다")
     private UUID storeId;
