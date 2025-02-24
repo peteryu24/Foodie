@@ -19,12 +19,13 @@ pipeline {
 
     post {
         success {
-            githubCommitStatus context: 'build', state: 'success', description: 'Build succeeded', targetUrl: "${BUILD_URL}"
+            echo 'deployment success'
         }
         failure {
-            githubCommitStatus context: 'build', state: 'failure', description: 'Build failed', targetUrl: "${BUILD_URL}"
+            echo 'deployment failure'
         }
     }
+
 
     stages {
         stage('Get Merge Request and preBuildMerge') {
@@ -85,12 +86,12 @@ pipeline {
             }
         }
 
-        //stage('Test') {
-        //    steps {
-        //        echo 'Test...'
-        //        sh './gradlew test'
-        //    }
-        //}
+        stage('Test') {
+            steps {
+                echo 'Test...'
+                sh './gradlew test'
+            }
+        }
 
         stage('[Backend] Image Build & DockerHub Push') {
             when {
