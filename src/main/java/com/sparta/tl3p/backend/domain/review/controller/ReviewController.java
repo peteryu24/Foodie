@@ -103,7 +103,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
-    @PreAuthorize("hasAnyAuthority('CUSTOMER','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER','ROLE_MANAGER')")
     public ResponseEntity<SuccessResponseDto> deleteReview(
             @PathVariable UUID reviewId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
