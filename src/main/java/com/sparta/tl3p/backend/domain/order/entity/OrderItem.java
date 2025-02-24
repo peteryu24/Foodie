@@ -39,7 +39,6 @@ public class OrderItem extends BaseEntity {
 
     // OrderItemRequestDto와 Item을 이용하여 OrderItem을 생성하는 생성자
     public OrderItem(OrderItemRequestDto dto, Item item) {
-        this.orderItemId = UUID.randomUUID();
         this.item = item;
         this.quantity = dto.getQuantity();
         this.price = item.getPrice().multiply(BigDecimal.valueOf(dto.getQuantity()));
