@@ -131,17 +131,6 @@ class ReviewServiceTest {
     @Test
     @DisplayName("리뷰 단건 조회 테스트")
     void searchReviewTest_success() {
-        // todo 튜터님 질문 ..
-//        // given
-//        when(reviewRepository.findByIdAndNotInReviewStatus(reviewId, ReviewStatus.DELETED)).thenReturn(Optional.of(review));
-//
-//        // when
-//        ReviewResponseDto responseDto = reviewService.findReview(reviewId);
-//
-//        // then
-//        assertThat(responseDto.getReviewId()).isEqualTo(reviewId);
-//        assertThat(responseDto.getScore()).isEqualTo(4.5);
-//        assertThat(responseDto.getContent()).isEqualTo("created review");
     }
 
     @Test
@@ -213,7 +202,7 @@ class ReviewServiceTest {
     void hideReviewTest_success() {
         // given
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
+        when(reviewRepository.findByReviewIdAndStatusNot(reviewId,ReviewStatus.DELETED)).thenReturn(Optional.of(review));
 
         // when
         reviewService.hideReview(reviewId, memberId);
@@ -226,20 +215,22 @@ class ReviewServiceTest {
     @DisplayName("리뷰 숨김 예외 테스트")
     void hideReviewTest_reviewNotFound() {
         // given
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(reviewRepository.findByReviewIdAndStatusNot(reviewId,ReviewStatus.DELETED)).thenReturn(Optional.empty());
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> reviewService.hideReview(reviewId,memberId));
 
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REVIEW_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REVIEW_ALREADY_DELETED);
     }
 
     @Test
     @DisplayName("리뷰 삭제 테스트")
     void deleteReviewTest_success() {
         // given
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(reviewRepository.findByReviewIdAndStatusNot(reviewId, ReviewStatus.DELETED)).thenReturn(Optional.of(review));
 
         // when
         reviewService.deleteReview(reviewId,memberId);
@@ -252,12 +243,13 @@ class ReviewServiceTest {
     @DisplayName("리뷰 삭제 예외 테스트")
     void deleteReview_reviewNotFound() {
         // given
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(reviewRepository.findByReviewIdAndStatusNot(reviewId,ReviewStatus.DELETED)).thenReturn(Optional.empty());
 
         // when & then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> reviewService.deleteReview(reviewId,memberId));
 
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REVIEW_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REVIEW_ALREADY_DELETED);
     }
 }
