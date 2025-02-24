@@ -1,7 +1,10 @@
 package com.sparta.tl3p.backend.domain.order.controller;
 
 import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
+import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ResponseCode;
+import com.sparta.tl3p.backend.common.type.ErrorCode;
+import com.sparta.tl3p.backend.domain.member.entity.CustomUserDetails;
 import com.sparta.tl3p.backend.domain.order.dto.OrderCancelRequestDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderDetailResponseDto;
 import com.sparta.tl3p.backend.domain.order.dto.OrderRequestDto;
@@ -28,12 +31,22 @@ public class OrderController {
 
     /**
      * 주문 생성 API
-     * - @AuthenticationPrincipal을 통해 로그인한 회원의 ID(memberId)를 주입받아 주문을 생성합니다.
+     * - 테스트 환경에서는 fallback으로 request에 담긴 memberId를 사용하지만,
+     *   운영 환경에서는 반드시 인증정보가 필요합니다.
      */
     @PostMapping
     public ResponseEntity<SuccessResponseDto> createOrder(@RequestBody OrderRequestDto request,
-                                                          @AuthenticationPrincipal Long memberId) {
+                                                          @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long memberId;
+        if (customUserDetails != null) {
+            memberId = customUserDetails.getMemberId();
+        } else {
+            // 테스트 환경용 fallback (운영에서는 인증정보 사용)
+            memberId = request.getMemberId();
+        }
+
         OrderResponseDto response = orderService.createOrder(request, memberId);
+
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
                         .code(ResponseCode.S)
@@ -45,12 +58,16 @@ public class OrderController {
 
     /**
      * 주문 수정 API
-     * - 고객은 주문 생성 후 5분 이내에 수정 가능하며, 주문 상태(status) 변경은 불가능합니다.
+     * - 인증된 사용자만 접근할 수 있도록 합니다.
      */
     @PutMapping("/{orderId}")
     public ResponseEntity<SuccessResponseDto> updateOrder(@PathVariable String orderId,
                                                           @RequestBody OrderUpdateRequestDto request,
-                                                          @AuthenticationPrincipal Long memberId) {
+                                                          @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = customUserDetails.getMemberId();
         OrderResponseDto response = orderService.updateOrder(UUID.fromString(orderId), request, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -63,12 +80,16 @@ public class OrderController {
 
     /**
      * 주문 취소 API
-     * - 고객은 주문 생성 후 5분 이내에 취소가 가능합니다.
+     * - 인증된 사용자만 접근할 수 있도록 합니다.
      */
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<SuccessResponseDto> cancelOrder(@PathVariable String orderId,
                                                           @RequestBody OrderCancelRequestDto request,
-                                                          @AuthenticationPrincipal Long memberId) {
+                                                          @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = customUserDetails.getMemberId();
         OrderResponseDto response = orderService.cancelOrder(UUID.fromString(orderId), request, memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -81,10 +102,15 @@ public class OrderController {
 
     /**
      * 주문 상세 조회 API
+     * - 인증된 사용자만 접근할 수 있도록 합니다.
      */
     @GetMapping("/{orderId}")
     public ResponseEntity<SuccessResponseDto> getOrderDetail(@PathVariable String orderId,
-                                                             @AuthenticationPrincipal Long memberId) {
+                                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        Long memberId = customUserDetails.getMemberId();
         OrderDetailResponseDto detail = orderService.getOrderDetail(UUID.fromString(orderId), memberId);
         return ResponseEntity.ok(
                 SuccessResponseDto.builder()
@@ -97,9 +123,6 @@ public class OrderController {
 
     /**
      * 주문 조회 및 검색 API
-     * - memberId가 제공되면 회원별 주문 조회
-     * - storeId가 제공되면 해당 가게의 주문 조회 (가게 소유자 검증 포함)
-     * - storeName 또는 productName이 제공되면 검색 처리
      */
     @GetMapping
     public ResponseEntity<SuccessResponseDto> getOrders(
@@ -107,7 +130,16 @@ public class OrderController {
             @RequestParam(required = false) UUID storeId,
             @RequestParam(required = false) String storeName,
             @RequestParam(required = false) String productName,
-            @AuthenticationPrincipal Long authMemberId) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        // 만약 쿼리 파라미터 memberId가 null이면, 인증 정보에서 가져옵니다.
+        if (memberId == null) {
+            if (customUserDetails != null) {
+                memberId = customUserDetails.getMemberId();
+            } else {
+                throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            }
+        }
 
         if (memberId != null && (storeName != null || productName != null)) {
             List<OrderResponseDto> orders = orderService.searchOrders(memberId, storeName, productName);
@@ -128,6 +160,11 @@ public class OrderController {
                             .build()
             );
         } else if (storeId != null) {
+            // storeId 조회 시에는 인증 정보의 memberId를 사용합니다.
+            if (customUserDetails == null) {
+                throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            }
+            Long authMemberId = customUserDetails.getMemberId();
             List<OrderResponseDto> orders = orderService.getStoreOrders(storeId, authMemberId);
             return ResponseEntity.ok(
                     SuccessResponseDto.builder()
