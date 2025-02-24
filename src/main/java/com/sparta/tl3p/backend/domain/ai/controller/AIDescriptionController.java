@@ -7,6 +7,8 @@ import com.sparta.tl3p.backend.domain.ai.service.AIDescriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +24,15 @@ public class AIDescriptionController {
     @PostMapping("/items/ai-description")
     @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<SuccessResponseDto> createAIDescription(
-            @RequestBody AIDescriptionRequestDto request
+            @RequestBody AIDescriptionRequestDto request,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        Long memberId = Long.parseLong(userDetails.getUsername());
+
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
                 .message("상품 설명 생성 요청 성공")
-                .data(aiDescriptionService.generateDescription(request))
+                .data(aiDescriptionService.generateDescription(request, memberId))
                 .build());
     }
 }
