@@ -4,11 +4,11 @@ import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
 import com.sparta.tl3p.backend.common.type.ResponseCode;
 import com.sparta.tl3p.backend.domain.ai.dto.AIDescriptionRequestDto;
 import com.sparta.tl3p.backend.domain.ai.service.AIDescriptionService;
+import com.sparta.tl3p.backend.domain.member.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +22,12 @@ public class AIDescriptionController {
     private final AIDescriptionService aiDescriptionService;
 
     @PostMapping("/items/ai-description")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_OWNER')")
     public ResponseEntity<SuccessResponseDto> createAIDescription(
             @RequestBody AIDescriptionRequestDto request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long memberId = Long.parseLong(userDetails.getUsername());
+        Long memberId = userDetails.getMemberId();
 
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
