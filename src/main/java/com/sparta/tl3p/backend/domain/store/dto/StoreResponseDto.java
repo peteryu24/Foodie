@@ -36,8 +36,9 @@ public class StoreResponseDto {
         this.categoryIds = store.getStoreCategories().stream()
                 .map(StoreCategory::getCategoryId)
                 .collect(Collectors.toList());
-        this.avgScore = avgScore;
+        this.avgScore = 0;
     }
+
     public StoreResponseDto(Store store, double avgScore) {
         this(store);
         this.avgScore = avgScore;

@@ -26,9 +26,6 @@ public class StoreRequestDto {
     @NotNull(message = "가게 상태는 필수입니다.")
     private StoreStatus status;
 
-    @NotNull(message = "가게 주인 ID는 필수입니다.")
-    private Long memberId;
-
     private List<String> categoryIds;
 
     // 테스트용
