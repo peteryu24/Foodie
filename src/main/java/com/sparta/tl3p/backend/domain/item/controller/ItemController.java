@@ -4,6 +4,7 @@ import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
 import com.sparta.tl3p.backend.common.type.ResponseCode;
 import com.sparta.tl3p.backend.domain.item.dto.*;
 import com.sparta.tl3p.backend.domain.item.service.ItemService;
+import com.sparta.tl3p.backend.domain.member.entity.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,7 +24,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER','MASTER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER','ROLE_OWNER','ROLE_MANAGER','ROLE_MASTER')")
     public ResponseEntity<SuccessResponseDto> getAllItems(
             @ModelAttribute @Valid ItemSearchRequestDto request
     ) {
@@ -37,7 +37,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER','MASTER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER','ROLE_OWNER','ROLE_MANAGER','ROLE_MASTER')")
     public ResponseEntity<SuccessResponseDto> getItem(
             @PathVariable UUID itemId
     ) {
@@ -49,12 +49,12 @@ public class ItemController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_OWNER')")
     public ResponseEntity<SuccessResponseDto> createItem(
             @Valid @RequestBody ItemCreateRequestDto request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long memberId = Long.valueOf(userDetails.getUsername());
+        Long memberId = userDetails.getMemberId();
 
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
@@ -64,13 +64,13 @@ public class ItemController {
     }
 
     @PutMapping("/{itemId}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_OWNER')")
     public ResponseEntity<SuccessResponseDto> updateItem(
             @PathVariable UUID itemId,
             @Valid @RequestBody ItemUpdateRequestDto request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long memberId = Long.valueOf(userDetails.getUsername());
+        Long memberId = userDetails.getMemberId();
 
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
@@ -80,12 +80,12 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_OWNER')")
     public ResponseEntity<SuccessResponseDto> deleteItem(
             @PathVariable UUID itemId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long memberId = Long.valueOf(userDetails.getUsername());
+        Long memberId = userDetails.getMemberId();
 
         itemService.deleteItem(itemId, memberId);
         return ResponseEntity.ok(SuccessResponseDto.builder()
@@ -95,12 +95,12 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_OWNER')")
     public ResponseEntity<SuccessResponseDto> hideItem(
             @PathVariable UUID itemId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Long memberId = Long.valueOf(userDetails.getUsername());
+        Long memberId = userDetails.getMemberId();
 
         return ResponseEntity.ok(SuccessResponseDto.builder()
                 .code(ResponseCode.S)
