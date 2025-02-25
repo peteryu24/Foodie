@@ -132,7 +132,7 @@ public class MemberService {
     }
 
     // 로그인
-    public LoginResponseDto login(LoginRequestDto requestDto) {
+    public String login(LoginRequestDto requestDto) {
 
         // 사용자 조회
         Member member = memberRepository.findByUsername(requestDto.getUsername())
@@ -150,7 +150,7 @@ public class MemberService {
 
         redisService.saveRefreshToken(member.getMemberId(), refreshToken, 7 * 24 * 60 * 60 * 1000L);// 7일
 
-        return new LoginResponseDto(accessToken, refreshToken);
+        return accessToken;
     }
 
     // 로그아웃

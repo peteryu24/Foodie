@@ -24,7 +24,7 @@ public class ReviewOwnerController {
     private final ReviewService reviewService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     public ResponseEntity<SuccessResponseDto> searchOwnerReviews(
             @RequestParam(required = false) UUID storeId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {

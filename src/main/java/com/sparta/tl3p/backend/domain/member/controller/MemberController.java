@@ -1,5 +1,7 @@
 package com.sparta.tl3p.backend.domain.member.controller;
 
+import com.sparta.tl3p.backend.common.dto.SuccessResponseDto;
+import com.sparta.tl3p.backend.common.type.ResponseCode;
 import com.sparta.tl3p.backend.domain.member.dto.LoginRequestDto;
 import com.sparta.tl3p.backend.domain.member.dto.LoginResponseDto;
 import com.sparta.tl3p.backend.domain.member.dto.MemberRequestDto;
@@ -7,6 +9,7 @@ import com.sparta.tl3p.backend.domain.member.dto.MemberResponseDto;
 import com.sparta.tl3p.backend.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -67,16 +70,31 @@ public class MemberController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(
+    public ResponseEntity<SuccessResponseDto> login(
             @Valid @RequestBody LoginRequestDto requestDto){
-        return  ResponseEntity.ok(memberService.login(requestDto));
+
+        String accessToken = memberService.login(requestDto);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // Authorization 헤더 추가
+                .body(SuccessResponseDto.builder()
+                        .code(ResponseCode.S)  //
+                        .message("로그인 성공")
+                        .data(null) // JSON 응답에는 아무 토큰도 포함하지 않음
+                        .build());
     }
 
     //로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(
+    public ResponseEntity<SuccessResponseDto> logout(
             @RequestHeader("Authorization") String token) {
         memberService.logout(token);
-        return ResponseEntity.ok("로그아웃 되었습니다.");
+
+        return ResponseEntity.ok()
+                .body(SuccessResponseDto.builder()
+                        .code(ResponseCode.S)
+                        .message("로그아웃 성공")
+                        .data(null)
+                        .build());
     }
 }
