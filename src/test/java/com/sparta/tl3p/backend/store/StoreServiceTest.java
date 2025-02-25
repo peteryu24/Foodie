@@ -7,6 +7,8 @@ import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.store.dto.StoreRequestDto;
 import com.sparta.tl3p.backend.domain.store.dto.StoreResponseDto;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
+import com.sparta.tl3p.backend.domain.store.entity.StoreCategory;
+import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import com.sparta.tl3p.backend.domain.store.repository.StoreCategoryRepository;
 import com.sparta.tl3p.backend.domain.store.repository.StoreRepository;
@@ -46,13 +48,9 @@ class StoreServiceTest {
 
         owner = mock(Member.class);
         lenient().when(owner.getMemberId()).thenReturn(1L);
-        lenient().when(owner.getUsername()).thenReturn("testUser");
-        lenient().when(owner.getEmail()).thenReturn("test@gmail.com");
 
         address = mock(Address.class);
         lenient().when(address.getCity()).thenReturn("Seoul");
-        lenient().when(address.getStreet()).thenReturn("Gangnam-gu 123");
-        lenient().when(address.getZipcode()).thenReturn("12345");
 
         store = Store.builder()
                 .name("Test Store")
@@ -62,12 +60,10 @@ class StoreServiceTest {
                 .build();
     }
 
-
-
     @Test
     void returnStoreDetails_whenStoreExists() {
         // given
-        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
         when(storeRepository.findAvgReviewScoreByStoreId(storeId)).thenReturn(4.5);
 
         // when
@@ -82,7 +78,7 @@ class StoreServiceTest {
     @Test
     void throwException_whenStoreNotFound() {
         // given
-        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> storeService.getStore(storeId))
@@ -94,10 +90,11 @@ class StoreServiceTest {
     void returnStores_whenSearchMatches() {
         // given
         List<Store> stores = Collections.singletonList(store);
-        when(storeRepository.findStoresByCategoryAndQuery("Cafe", "Test")).thenReturn(stores);
+        when(storeRepository.findStoresByCategoryAndQuery(CategoryType.CAFE, "Test"))
+                .thenReturn(stores);
 
         // when
-        List<StoreResponseDto> result = storeService.searchStores("Cafe", "Test");
+        List<StoreResponseDto> result = storeService.searchStores("CAFE", "Test");
 
         // then
         assertThat(result).hasSize(1);
@@ -121,12 +118,12 @@ class StoreServiceTest {
     void updateStoreTest() {
         // given
         StoreRequestDto requestDto = mock(StoreRequestDto.class);
-        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
         lenient().when(requestDto.getName()).thenReturn("Updated Store");
         lenient().when(requestDto.getContent()).thenReturn("Updated content");
         lenient().when(requestDto.getAddress()).thenReturn(address);
         lenient().when(requestDto.getStatus()).thenReturn(StoreStatus.UPDATED);
-        lenient().when(requestDto.getCategoryIds()).thenReturn(Arrays.asList("Food", "Coffee"));
+        lenient().when(requestDto.getCategories()).thenReturn(Arrays.asList(CategoryType.CHICKEN, CategoryType.CAFE));
 
         // when
         storeService.updateStore(storeId, requestDto, 1L);
@@ -140,9 +137,20 @@ class StoreServiceTest {
     }
 
     @Test
+    void throwException_whenUnauthorizedUserTriesToUpdateStore() {
+        // given
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
+
+        // when & then
+        assertThatThrownBy(() -> storeService.updateStore(storeId, mock(StoreRequestDto.class), 2L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.UNAUTHORIZED_ACTION.getMessage());
+    }
+
+    @Test
     void hideStoreTest() {
         // given
-        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
 
         // when
         storeService.hideStore(storeId, 1L);
@@ -152,15 +160,37 @@ class StoreServiceTest {
     }
 
     @Test
+    void throwException_whenUnauthorizedUserTriesToHideStore() {
+        // given
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
+
+        // when & then
+        assertThatThrownBy(() -> storeService.hideStore(storeId, 2L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.UNAUTHORIZED_ACTION.getMessage());
+    }
+
+    @Test
     void deleteStoreTest() {
         // given
-        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
 
         // when
         storeService.deleteStore(storeId, 1L);
 
         // then
-        verify(storeRepository).findById(storeId);
+        verify(storeRepository).findByIdExcludeDeleted(storeId);
+    }
+
+    @Test
+    void throwException_whenUnauthorizedUserTriesToDeleteStore() {
+        // given
+        when(storeRepository.findByIdExcludeDeleted(storeId)).thenReturn(Optional.of(store));
+
+        // when & then
+        assertThatThrownBy(() -> storeService.deleteStore(storeId, 2L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.UNAUTHORIZED_ACTION.getMessage());
     }
 
     @Test

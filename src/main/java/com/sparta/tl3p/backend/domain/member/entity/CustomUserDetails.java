@@ -23,6 +23,14 @@ public class CustomUserDetails implements UserDetails {
         this.role = member.getRole();
     }
 
+    // 추가 생성자: memberId, username, password, role
+    public CustomUserDetails(Long memberId, String username, String password, Role role) {
+        this.memberId = memberId;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

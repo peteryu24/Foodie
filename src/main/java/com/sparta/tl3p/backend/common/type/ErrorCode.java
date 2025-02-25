@@ -1,7 +1,6 @@
 package com.sparta.tl3p.backend.common.type;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
@@ -17,14 +16,20 @@ public enum ErrorCode {
 
     // Store
     STORE_NOT_FOUND("S-001", "Store Not Found"),
+    INVALID_CATEGORY("S-002", "Invalid store category"),
+    UNAUTHORIZED_ACTION("S-003", "Unauthorized action on store"),
+
     // Review
     REVIEW_NOT_FOUND("R-001", "Review Not Found"),
     REVIEW_ALREADY_DELETED("R-002", "Review Already Deleted"),
+
     // Item
     ITEM_NOT_FOUND("I-001", "Item Not Found"),
+
     // Order
     ORDER_NOT_FOUND("O-001", "Order Not Found"),
     ORDER_TIME_OUT("O-002", "Order Time Out"),
+
     // Payment
     PAYMENT_NOT_FOUND("P-001", "Payment Not Found"),
     PAYMENT_FAILED("P-002", "Payment Failed"),
@@ -36,15 +41,14 @@ public enum ErrorCode {
     // API
     API_UNEXPECTED_ERROR("A-001","API Error"),
     API_CALL_ERROR("A-002", "API Call Error"),
-    REST_TEMPLATE_ERROR("A-003", "REST Template Error"),
+    REST_CLIENT_ERROR("A-003", "REST CLIENT Error"),
     API_STATUS_ERROR("A-004", "API Status Error"),
     API_RESPONSE_PARSE_ERROR("A-005", "API Response Parse Error"),
+    API_SERVER_ERROR("A-006", "API Server Error"),
 
     // Unexpected Exception
-    UNEXPECTED_ERROR("D-001", "Unexpected error "),
-    // Unauthorized
-    ACCESS_DENIED("D-002", "Access Denied"),;
-
+    UNEXPECTED_ERROR("D-001", "Unexpected error"),
+    ACCESS_DENIED("D-002", "Access Denied");
 
     private final String code;
     private final String message;

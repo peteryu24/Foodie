@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.store.dto;
 
 import com.sparta.tl3p.backend.common.type.Address;
+import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class StoreRequestDto {
 
-    @NotNull(message = "가게 이름은 필수입니다.")
+    @NotBlank(message = "가게 이름은 필수입니다.")
     private String name;
 
     private String content;
@@ -26,14 +27,6 @@ public class StoreRequestDto {
     @NotNull(message = "가게 상태는 필수입니다.")
     private StoreStatus status;
 
-    @NotNull(message = "가게 주인 ID는 필수입니다.")
-    private Long memberId;
-
-    private List<String> categoryIds;
-
-    // 테스트용
-    public StoreRequestDto(String name, String content) {
-        this.name = name;
-        this.content = content;
-    }
+    @NotNull(message = "카테고리는 필수입니다.")
+    private List<CategoryType> categories;
 }

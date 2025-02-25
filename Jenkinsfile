@@ -28,7 +28,7 @@ pipeline {
 
 
     stages {
-        stage('Get Merge Request and preBuildMerge') {
+        stage('Git Clone') {
             steps {
                 git branch: "${githubTargetBranch}", credentialsId: 'github_token',
                 url: "${env.githubCloneUrl}"
@@ -130,10 +130,24 @@ pipeline {
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} "sudo docker run -i -e TZ=Asia/Seoul --env-file=/home/ubuntu/env/db.env --env-file=/home/ubuntu/env/security.env --env-file=/home/ubuntu/env/test-db.env --name tl1p -p ${env.releasePort}:${env.releasePort} -d $imageName:latest"
+                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} << 'EOF'
+                            if [ \$(docker ps -q --filter "name=tl1p") ]; then
+                                docker stop tl1p
+                                docker rm tl1p
+                            fi
+
+                            sudo docker run -i -e TZ=Asia/Seoul \
+                                --env-file=/home/ubuntu/env/db.env \
+                                --env-file=/home/ubuntu/env/security.env \
+                                --env-file=/home/ubuntu/env/test-db.env \
+                                --name tl1p \
+                                -p ${env.releasePort}:${env.releasePort} \
+                                -d $imageName:latest
+                        EOF
                     """
                 }
             }
         }
+
     }
 }
