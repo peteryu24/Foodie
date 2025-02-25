@@ -13,11 +13,10 @@ import com.sparta.tl3p.backend.domain.item.repository.ItemRepository;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -34,7 +33,7 @@ public class AIDescriptionService {
 
     private final AIDescriptionRepository aiDescriptionRepository;
     private final ItemRepository          itemRepository;
-    private final RestTemplate            restTemplate;
+    private final RestClient              restClient;
 
     @Transactional
     public AIDescriptionResponseDto generateDescription(AIDescriptionRequestDto request, Long memberId) {
@@ -81,23 +80,19 @@ public class AIDescriptionService {
                 .build()
                 .toUri();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         GeminiApiRequestDto geminiApiRequest = GeminiApiRequestDto.from(prompt);
 
         try {
-            ResponseEntity<GeminiApiResponseDto> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    new HttpEntity<>(geminiApiRequest, headers),
-                    GeminiApiResponseDto.class
-            );
+            GeminiApiResponseDto response = restClient.post()
+                    .uri(url)
+                    .body(geminiApiRequest)
+                    .retrieve()
+                    .body(GeminiApiResponseDto.class);
 
-            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            if (response == null) {
                 throw new BusinessException(ErrorCode.API_STATUS_ERROR);
             }
-            return response.getBody().extractText();
+            return response.extractText();
         } catch (RestClientException e) {
             throw new BusinessException(ErrorCode.API_UNEXPECTED_ERROR);
         }
