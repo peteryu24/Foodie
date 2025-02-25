@@ -2,7 +2,6 @@ package com.sparta.tl3p.backend.domain.order.service;
 
 import com.sparta.tl3p.backend.common.exception.BusinessException;
 import com.sparta.tl3p.backend.common.type.ErrorCode;
-import com.sparta.tl3p.backend.domain.item.entity.Item;
 import com.sparta.tl3p.backend.domain.item.repository.ItemRepository;
 import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.member.enums.Role;
@@ -26,6 +25,7 @@ import com.sparta.tl3p.backend.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +53,7 @@ public class OrderService {
         BigDecimal totalAmount = BigDecimal.ZERO;
         if (dto.getItems() != null && !dto.getItems().isEmpty()) {
             for (var itemDto : dto.getItems()) {
-                Item item = itemRepository.findById(itemDto.getItemId())
+                var item = itemRepository.findById(itemDto.getItemId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
                 totalAmount = totalAmount.add(item.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())));
             }
@@ -63,11 +63,16 @@ public class OrderService {
         order.setCreatedAt(LocalDateTime.now());
 
         if (dto.getItems() != null && !dto.getItems().isEmpty()) {
-            List<OrderItem> orderItems = dto.getItems().stream().map(itemDto -> {
-                Item item = itemRepository.findById(itemDto.getItemId())
-                        .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
-                return new OrderItem(itemDto, item);
-            }).collect(Collectors.toList());
+            List<OrderItem> orderItems = dto.getItems().stream()
+                    .map(itemDto -> {
+                        var item = itemRepository.findById(itemDto.getItemId())
+                                .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
+                        OrderItem orderItem = new OrderItem(itemDto, item);
+                        // 1번 방법: OrderItem 생성 후 현재 주문(Order)을 할당
+                        orderItem.setOrder(order);
+                        return orderItem;
+                    })
+                    .collect(Collectors.toList());
             order.setOrderItems(orderItems);
         }
 
@@ -93,31 +98,45 @@ public class OrderService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-        // 역할에 따른 접근 제어
         if (member.getRole() == Role.CUSTOMER) {
-            // 고객은 자신의 주문만 수정 가능
             if (!order.getMember().getMemberId().equals(memberId)) {
                 throw new BusinessException(ErrorCode.ACCESS_DENIED);
             }
-            // 주문 생성 후 5분 이내여야 함
             if (order.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
                 throw new BusinessException(ErrorCode.ORDER_TIME_OUT);
             }
         } else if (member.getRole() == Role.OWNER) {
-            // 가게주인은 해당 주문이 자신 소유의 가게에 속해있는지 확인
             Store store = order.getStore();
             if (!store.getMember().getMemberId().equals(memberId)) {
                 throw new BusinessException(ErrorCode.ACCESS_DENIED);
             }
-            // 가게주인은 별도 시간 제한 없이 수정 가능 (필요시 추가 검증 가능)
-        } else if (member.getRole() == Role.MANAGER || member.getRole() == Role.MASTER) {
-            // 관리자/최고관리자는 전체 접근 허용
-        } else {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+        // 관리자나 최고관리자는 전체 수정 허용
+
+        // 주문의 storeRequest 업데이트
+        order.setStoreRequest(dto.getStoreRequest());
+
+        // 주문 항목 업데이트: 기존 항목을 전부 제거하고 새로 추가
+        if (dto.getItems() != null) {
+            // 기존 주문 항목 전체 제거
+            order.getOrderItems().clear();
+
+            // 새 항목 리스트 생성 및 주문에 추가
+            List<OrderItem> updatedItems = dto.getItems().stream()
+                    .map(itemDto -> {
+                        // itemId로 실제 상품 엔티티 조회
+                        var item = itemRepository.findById(itemDto.getItemId())
+                                .orElseThrow(() -> new BusinessException(ErrorCode.ITEM_NOT_FOUND));
+                        // 새로운 OrderItem 생성
+                        OrderItem orderItem = new OrderItem(itemDto, item);
+                        orderItem.setOrder(order);
+                        return orderItem;
+                    })
+                    .collect(Collectors.toList());
+            order.getOrderItems().addAll(updatedItems);
         }
 
-        // 실제 업데이트 진행 (Order 엔티티 내부에서 업데이트 필드에 대한 처리)
-        order.updateOrder(dto);
+        // 변경된 주문 저장
         Order updatedOrder = orderRepository.save(order);
         return new OrderResponseDto(updatedOrder);
     }
@@ -129,27 +148,20 @@ public class OrderService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-        // 역할에 따른 취소 제어
         if (member.getRole() == Role.CUSTOMER) {
-            // 고객은 자신의 주문만 취소 가능
             if (!order.getMember().getMemberId().equals(memberId)) {
                 throw new BusinessException(ErrorCode.ACCESS_DENIED);
             }
-            // 주문 생성 후 5분 이내여야 취소 가능
             if (order.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
                 throw new BusinessException(ErrorCode.ORDER_TIME_OUT);
             }
         } else if (member.getRole() == Role.OWNER) {
-            // 가게주인의 경우 주문이 해당 가게에 속해있는지 확인
             Store store = order.getStore();
             if (!store.getMember().getMemberId().equals(memberId)) {
                 throw new BusinessException(ErrorCode.ACCESS_DENIED);
             }
-        } else if (member.getRole() == Role.MANAGER || member.getRole() == Role.MASTER) {
-            // 관리자/최고관리자는 전체 접근 허용
-        } else {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
+        // 관리자/최고관리자: 전체 접근 허용
 
         order.cancelOrder();
         Order canceledOrder = orderRepository.save(order);
@@ -162,7 +174,7 @@ public class OrderService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        // 고객은 자신의 주문만 조회, 가게주인은 가게 주문만, 관리자/최고관리자는 전체 접근 허용
+
         if (member.getRole() == Role.CUSTOMER) {
             if (!order.getMember().getMemberId().equals(memberId)) {
                 throw new BusinessException(ErrorCode.ACCESS_DENIED);
@@ -173,6 +185,8 @@ public class OrderService {
                 throw new BusinessException(ErrorCode.ACCESS_DENIED);
             }
         }
+        // 관리자나 최고관리자는 전체 주문 조회 가능
+
         return new OrderDetailResponseDto(order);
     }
 
