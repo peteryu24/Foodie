@@ -7,6 +7,7 @@ import com.sparta.tl3p.backend.domain.member.entity.Member;
 import com.sparta.tl3p.backend.domain.store.dto.StoreRequestDto;
 import com.sparta.tl3p.backend.domain.store.dto.StoreResponseDto;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
+import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import com.sparta.tl3p.backend.domain.store.repository.StoreCategoryRepository;
 import com.sparta.tl3p.backend.domain.store.repository.StoreRepository;
@@ -94,7 +95,8 @@ class StoreServiceTest {
     void returnStores_whenSearchMatches() {
         // given
         List<Store> stores = Collections.singletonList(store);
-        when(storeRepository.findStoresByCategoryAndQuery("Cafe", "Test")).thenReturn(stores);
+        when(storeRepository.findStoresByCategoryAndQuery(CategoryType.valueOf("CAFE"), "Test"))
+                .thenReturn(stores);
 
         // when
         List<StoreResponseDto> result = storeService.searchStores("Cafe", "Test");
@@ -103,6 +105,7 @@ class StoreServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("Test Store");
     }
+
 
     @Test
     void returnStoresByOwner() {
@@ -126,7 +129,7 @@ class StoreServiceTest {
         lenient().when(requestDto.getContent()).thenReturn("Updated content");
         lenient().when(requestDto.getAddress()).thenReturn(address);
         lenient().when(requestDto.getStatus()).thenReturn(StoreStatus.UPDATED);
-        lenient().when(requestDto.getCategoryIds()).thenReturn(Arrays.asList("Food", "Coffee"));
+        lenient().when(requestDto.getCategories()).thenReturn(Arrays.asList(CategoryType.CHICKEN, CategoryType.CAFE));
 
         // when
         storeService.updateStore(storeId, requestDto, 1L);

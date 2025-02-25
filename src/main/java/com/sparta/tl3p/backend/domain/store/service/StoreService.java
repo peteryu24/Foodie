@@ -8,6 +8,7 @@ import com.sparta.tl3p.backend.domain.store.dto.StoreRequestDto;
 import com.sparta.tl3p.backend.domain.store.dto.StoreResponseDto;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import com.sparta.tl3p.backend.domain.store.entity.StoreCategory;
+import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 import com.sparta.tl3p.backend.domain.store.repository.StoreCategoryRepository;
 import com.sparta.tl3p.backend.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +24,17 @@ import java.util.stream.Collectors;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final StoreCategoryRepository storeCategoryRepository; // 추가
+    private final StoreCategoryRepository storeCategoryRepository;
     private final MemberRepository memberRepository;
-
 
     @Transactional
     public StoreResponseDto createStore(StoreRequestDto requestDto, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (requestDto.getCategories() == null || requestDto.getCategories().isEmpty()) {
+            throw new BusinessException(ErrorCode.INVALID_CATEGORY);
+        }
 
         Store store = Store.builder()
                 .name(requestDto.getName())
@@ -41,9 +45,8 @@ public class StoreService {
 
         storeRepository.save(store);
 
-        // 카테고리 저장
-        List<StoreCategory> categories = requestDto.getCategoryIds().stream()
-                .map(categoryId -> new StoreCategory(store, categoryId))
+        List<StoreCategory> categories = requestDto.getCategories().stream()
+                .map(category -> new StoreCategory(store, CategoryType.valueOf(category.name())))
                 .collect(Collectors.toList());
         storeCategoryRepository.saveAll(categories);
 
@@ -51,14 +54,15 @@ public class StoreService {
     }
 
     public StoreResponseDto getStore(UUID storeId) {
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findByIdExcludeDeleted(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         double avgScore = storeRepository.findAvgReviewScoreByStoreId(storeId);
         return new StoreResponseDto(store, avgScore);
     }
 
     public List<StoreResponseDto> searchStores(String category, String query) {
-        List<Store> stores = storeRepository.findStoresByCategoryAndQuery(category, query);
+        CategoryType categoryType = (category != null) ? CategoryType.valueOf(category.toUpperCase()) : null;
+        List<Store> stores = storeRepository.findStoresByCategoryAndQuery(categoryType, query);
         return stores.stream().map(StoreResponseDto::new).collect(Collectors.toList());
     }
 
@@ -69,30 +73,40 @@ public class StoreService {
 
     @Transactional
     public void updateStore(UUID storeId, StoreRequestDto requestDto, Long memberId) {
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findByIdExcludeDeleted(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        if (!store.getMember().getMemberId().equals(memberId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACTION);
+        }
 
         store.updateStore(requestDto.getName(), requestDto.getContent(), requestDto.getAddress(), requestDto.getStatus());
 
-
         storeCategoryRepository.deleteByStoreId(storeId);
-        List<StoreCategory> newCategories = requestDto.getCategoryIds().stream()
-                .map(categoryId -> new StoreCategory(store, categoryId))
+
+        List<StoreCategory> newCategories = requestDto.getCategories().stream()
+                .map(category -> new StoreCategory(store, CategoryType.valueOf(category.name())))
                 .collect(Collectors.toList());
         storeCategoryRepository.saveAll(newCategories);
     }
 
     @Transactional
     public void hideStore(UUID storeId, Long memberId) {
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findByIdExcludeDeleted(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        if (!store.getMember().getMemberId().equals(memberId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACTION);
+        }
         store.hideStore();
     }
 
     @Transactional
     public void deleteStore(UUID storeId, Long memberId) {
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findByIdExcludeDeleted(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        if (!store.getMember().getMemberId().equals(memberId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACTION);
+        }
         store.softDelete(memberId);
     }
 
