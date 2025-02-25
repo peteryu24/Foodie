@@ -14,7 +14,115 @@
 
 ![Image](https://github.com/user-attachments/assets/6be73b5a-f393-4660-8cc8-d9a018100d43)
 
+## 로컬 환경 구동 방법
+0. postgreSQL local installation
+   
+1. Clone Project
+```
+git clone https://github.com/haisley77/tl1p.git
+```
+
+2. Change path to /tl1p/src/main & make resources directory
+```
+mkdir resources
+```
+
+3. Change path to /tl1p/src/main/resources & make application.yml file
+```
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  config:
+    import:
+      - optional:file:env/db.env[.properties]
+      - optional:file:env/security.env[.properties]
+  application:
+    name: backend
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    show-sql: true
+    database: postgresql
+    hibernate:
+      ddl-auto: ${DATABASE_DDL_AUTO}
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_HOST}
+      timeout: ${REDIS_TIMEOUT}
+      lettuce:
+        pool:
+          max-active: ${REDIS_MAX_ACTIVE}
+          max-idle: ${REDIS_MAX_IDLE}
+          min-idle: ${REDIS_MIN_IDLE}
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-validity: ${ACCESS_EXPIRATION}
+  refresh-token-validity: ${REFRESH_EXPIRATION}
+  access-header: ${ACCESS_HEADER}
+  refresh-header: ${REFRESH_HEADER}
+
+api:
+  gemini:
+    key: ${AI_API_KEY}
+    url: ${AI_URL_ENTRYPOINT}
+
+```
+4. Change path to tl1p & make env directory
+```
+mkdir env
+```
+
+5. Change path to /tl1p/env & make db.env, security.env file
+
+db.env
+```
+DATABASE_URL=jdbc:postgresql://localhost:5432/tl1p
+DATABASE_USERNAME=<your_local_database_username>
+DATABASE_PASSWORD=<your_local_database_password>
+DATABASE_DDL_AUTO=none
+```
+
+security.env
+```
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_TIMEOUT=6000
+REDIS_MAX_ACTIVE=10
+REDIS_MAX_IDLE=10
+REDIS_MIN_IDLE=2
+
+JWT_SECRET_KEY=<>
+ACCESS_EXPIRATION=1800000
+REFRESH_EXPIRATION=604800000
+ACCESS_HEADER=Authorization
+REFRESH_HEADER=refresh:
+
+SERVER_PORT=<prefered_server_port_to_run>
+
+AI_API_KEY=<api_key>
+AI_URL_ENTRYPOINT=<api_url>
+```
+
+5. Change path to /tl1p & build
+```
+./gradlew build
+```
+
+6. Application start
+```
+java -jar tl1p-0.0.1-SNAPSHOT.jar
+```
+
 ## 프로젝트 구조
+
+<details>
+<summary>Application</summary>
 
 ```
 +---main
@@ -254,104 +362,19 @@
                                 
 
 ```
-
-## 로컬 환경 구동 방법
-0. postgreSQL local installation
-   
-1. Clone Project
-```
-git clone https://github.com/haisley77/tl1p.git
-```
-
-2. Change path to /tl1p/src/main & make resources directory
-```
-mkdir resources
-```
-
-3. Change path to /tl1p/src/main/resources & make application.yml file
-```
-server:
-  port: ${SERVER_PORT}
-
-spring:
-  config:
-    import:
-      - optional:file:env/db.env[.properties]
-      - optional:file:env/security.env[.properties]
-  application:
-    name: backend
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-
-  jpa:
-    show-sql: true
-    database: postgresql
-    hibernate:
-      ddl-auto: ${DATABASE_DDL_AUTO}
-    redis:
-      port: ${REDIS_PORT}
-      host: ${REDIS_HOST}
-      timeout: ${REDIS_TIMEOUT}
-      lettuce:
-        pool:
-          max-active: ${REDIS_MAX_ACTIVE}
-          max-idle: ${REDIS_MAX_IDLE}
-          min-idle: ${REDIS_MIN_IDLE}
-
-jwt:
-  secret: ${JWT_SECRET_KEY}
-  access-token-validity: ${ACCESS_EXPIRATION}
-  refresh-token-validity: ${REFRESH_EXPIRATION}
-  access-header: ${ACCESS_HEADER}
-  refresh-header: ${REFRESH_HEADER}
-
-api:
-  gemini:
-    key: ${AI_API_KEY}
-    url: ${AI_URL_ENTRYPOINT}
-
-```
-4. Change path to tl1p & make env directory
-```
-mkdir env
-```
-
-5. Change path to /tl1p/env & make db.env, security.env file
-
-db.env
-```
-DATABASE_URL=jdbc:postgresql://localhost:5432/tl1p
-DATABASE_USERNAME=<your_local_database_username>
-DATABASE_PASSWORD=<your_local_database_password>
-DATABASE_DDL_AUTO=none
-```
-
-security.env
-```
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_TIMEOUT=6000
-REDIS_MAX_ACTIVE=10
-REDIS_MAX_IDLE=10
-REDIS_MIN_IDLE=2
-
-JWT_SECRET_KEY=<>
-ACCESS_EXPIRATION=1800000
-REFRESH_EXPIRATION=604800000
-ACCESS_HEADER=Authorization
-REFRESH_HEADER=refresh:
-
-SERVER_PORT=<prefered_server_port_to_run>
-
-AI_API_KEY=<api_key>
-AI_URL_ENTRYPOINT=<api_url>
-```
-
+</details>
 
 # 프로젝트 목적/상세
+
+- 간결하지만 향후 인프라 확장을 고려한 배포 환경 설계
+- Custom exception을 통한 Global Exception Handling과 logging
+- AI 서비스 API를 연동하여 상품 설명 자동 생성 기능 제공
+- 단위 테스트 코드 작성으로 비즈니스 로직 검증
+- Layered Architecture 기반 프로젝트 구조
+- Audit 기능을 활용해 Database에 데이터 감사 로그 기록
+- 공통 Response 구조로, 코드 일관성 유지
+
+
 
 # ERD
 
