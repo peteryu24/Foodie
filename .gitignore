@@ -52,4 +52,7 @@ lerna-debug.log*
 *.yml
 
 ### .env ###
-.env*
+*.env*
+
+### .sql ###
+*.sql
