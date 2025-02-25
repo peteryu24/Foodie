@@ -256,7 +256,7 @@
 ```
 
 ## 로컬 환경 구동 방법
-0. mysql, elk, prometheus 개별적으로 설치 해주셔야 합니다.
+0. postgreSQL local installation
    
 1. Clone Project
 ```
