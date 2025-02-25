@@ -1,7 +1,6 @@
 package com.sparta.tl3p.backend.common.type;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
@@ -42,9 +41,10 @@ public enum ErrorCode {
     // API
     API_UNEXPECTED_ERROR("A-001","API Error"),
     API_CALL_ERROR("A-002", "API Call Error"),
-    REST_TEMPLATE_ERROR("A-003", "REST Template Error"),
+    REST_CLIENT_ERROR("A-003", "REST CLIENT Error"),
     API_STATUS_ERROR("A-004", "API Status Error"),
     API_RESPONSE_PARSE_ERROR("A-005", "API Response Parse Error"),
+    API_SERVER_ERROR("A-006", "API Server Error"),
 
     // Unexpected Exception
     UNEXPECTED_ERROR("D-001", "Unexpected error"),
