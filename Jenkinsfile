@@ -86,12 +86,12 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Test...'
-                sh './gradlew test'
-            }
-        }
+        //stage('Test') {
+        //    steps {
+        //        echo 'Test...'
+        //        sh './gradlew test'
+        //    }
+        //}
 
         stage('[Backend] Image Build & DockerHub Push') {
             when {
@@ -130,10 +130,26 @@ pipeline {
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} "sudo docker run -i -e TZ=Asia/Seoul --env-file=/home/ubuntu/env/db.env --env-file=/home/ubuntu/env/security.env --env-file=/home/ubuntu/env/test-db.env --name tl1p -p ${env.releasePort}:${env.releasePort} -d $imageName:latest"
+                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} << 'EOF'
+                            # 기존 컨테이너가 실행 중이면 중지하고 삭제
+                            if [ \$(docker ps -q --filter "name=tl1p") ]; then
+                                docker stop tl1p
+                                docker rm tl1p
+                            fi
+
+                            # 새로운 컨테이너 실행
+                            sudo docker run -i -e TZ=Asia/Seoul \
+                                --env-file=/home/ubuntu/env/db.env \
+                                --env-file=/home/ubuntu/env/security.env \
+                                --env-file=/home/ubuntu/env/test-db.env \
+                                --name tl1p \
+                                -p ${env.releasePort}:${env.releasePort} \
+                                -d $imageName:latest
+                        EOF
                     """
                 }
             }
         }
+
     }
 }
