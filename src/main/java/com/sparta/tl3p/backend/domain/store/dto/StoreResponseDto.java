@@ -3,6 +3,7 @@ package com.sparta.tl3p.backend.domain.store.dto;
 import com.sparta.tl3p.backend.common.type.Address;
 import com.sparta.tl3p.backend.domain.store.entity.Store;
 import com.sparta.tl3p.backend.domain.store.entity.StoreCategory;
+import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 import com.sparta.tl3p.backend.domain.store.enums.StoreStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class StoreResponseDto {
     private Address address;
     private StoreStatus status;
     private Long memberId;
-    private List<String> categoryIds;
+    private List<CategoryType> categories;
     private double avgScore;
 
     public StoreResponseDto(Store store) {
@@ -33,13 +34,14 @@ public class StoreResponseDto {
         this.address = store.getAddress();
         this.status = store.getStatus();
         this.memberId = store.getMember().getMemberId();
-        this.categoryIds = store.getStoreCategories().stream()
-                .map(StoreCategory::getCategoryId)
+        this.categories = store.getStoreCategories().stream()
+                .map(StoreCategory::getCategory)
                 .collect(Collectors.toList());
-        this.avgScore = avgScore;
+        this.avgScore = 0.0;
     }
-    public StoreResponseDto(Store store, double avgScore) {
+
+    public StoreResponseDto(Store store, Double avgScore) {
         this(store);
-        this.avgScore = avgScore;
+        this.avgScore = (avgScore != null) ? avgScore : 0.0;
     }
 }

@@ -1,6 +1,7 @@
 package com.sparta.tl3p.backend.domain.store.entity;
 
 import com.sparta.tl3p.backend.common.audit.BaseEntity;
+import com.sparta.tl3p.backend.domain.store.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +23,12 @@ public class StoreCategory extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category_id", length = 20, nullable = false)
-    private String categoryId;
+    private CategoryType category;
 
-    public StoreCategory(Store store, String categoryId) {
+    public StoreCategory(Store store, CategoryType category) {
         this.store = store;
-        this.categoryId = categoryId;
+        this.category = category;
     }
 }

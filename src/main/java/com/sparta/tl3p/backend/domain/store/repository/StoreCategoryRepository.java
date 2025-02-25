@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface StoreCategoryRepository extends JpaRepository<StoreCategory, UUID> {
-    List<StoreCategory> findByStoreStoreId(UUID storeId);
+
+    List<StoreCategory> findByStoreId(UUID storeId);
 
     @Transactional
     @Modifying
