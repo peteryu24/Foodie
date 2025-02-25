@@ -80,7 +80,7 @@ mkdir env
 
 5. Change path to /tl1p/env & make db.env, security.env file
 
-db.env
+- db.env
 ```
 DATABASE_URL=jdbc:postgresql://localhost:5432/tl1p
 DATABASE_USERNAME=<your_local_database_username>
@@ -88,7 +88,7 @@ DATABASE_PASSWORD=<your_local_database_password>
 DATABASE_DDL_AUTO=none
 ```
 
-security.env
+- security.env
 ```
 REDIS_HOST=localhost
 REDIS_PORT=6379
@@ -125,241 +125,198 @@ java -jar tl1p-0.0.1-SNAPSHOT.jar
 <summary>Application</summary>
 
 ```
-+---main
-|   +---java
-|   |   \---com
-|   |       \---sparta
-|   |           \---tl3p
-|   |               \---backend
-|   |                   |   BackendApplication.java
-|   |                   |   
-|   |                   +---common
-|   |                   |   +---audit
-|   |                   |   |       AuditorAwareImpl.java
-|   |                   |   |       BaseEntity.java
-|   |                   |   |       
-|   |                   |   +---config
-|   |                   |   |       JpaConfig.java
-|   |                   |   |       QueryDslConfig.java
-|   |                   |   |       RedisConfig.java
-|   |                   |   |       RestClientConfig.java
-|   |                   |   |       SecurityConfig.java
-|   |                   |   |       SwaggerConfig.java
-|   |                   |   |       
-|   |                   |   +---dto
-|   |                   |   |       ErrorResponseDto.java
-|   |                   |   |       SuccessResponseDto.java
-|   |                   |   |       
-|   |                   |   +---exception
-|   |                   |   |       BusinessException.java
-|   |                   |   |       
-|   |                   |   +---filter
-|   |                   |   |       JwtAuthenticationFilter.java
-|   |                   |   |       
-|   |                   |   +---handler
-|   |                   |   |       GlobalExceptionHandler.java
-|   |                   |   |       
-|   |                   |   +---type
-|   |                   |   |       Address.java
-|   |                   |   |       ErrorCode.java
-|   |                   |   |       ResponseCode.java
-|   |                   |   |       
-|   |                   |   \---util
-|   |                   |           GenerateSecretKey.java
-|   |                   |           JwtTokenProvider.java
-|   |                   |           
-|   |                   \---domain
-|   |                       +---ai
-|   |                       |   +---controller
-|   |                       |   |       AIDescriptionController.java
-|   |                       |   |       
-|   |                       |   +---dto
-|   |                       |   |       AIDescriptionRequestDto.java
-|   |                       |   |       AIDescriptionResponseDto.java
-|   |                       |   |       GeminiApiRequestDto.java
-|   |                       |   |       GeminiApiResponseDto.java
-|   |                       |   |       
-|   |                       |   +---entity
-|   |                       |   |       AIDescription.java
-|   |                       |   |       
-|   |                       |   +---repository
-|   |                       |   |       AIDescriptionRepository.java
-|   |                       |   |       
-|   |                       |   \---service
-|   |                       |           AIDescriptionService.java
-|   |                       |           
-|   |                       +---item
-|   |                       |   +---controller
-|   |                       |   |       ItemController.java
-|   |                       |   |       
-|   |                       |   +---dto
-|   |                       |   |       ItemCreateRequestDto.java
-|   |                       |   |       ItemPageResponseDto.java
-|   |                       |   |       ItemResponseDto.java
-|   |                       |   |       ItemSearchRequestDto.java
-|   |                       |   |       ItemUpdateRequestDto.java
-|   |                       |   |       
-|   |                       |   +---entity
-|   |                       |   |       Item.java
-|   |                       |   |       
-|   |                       |   +---enums
-|   |                       |   |       ItemSortOption.java
-|   |                       |   |       ItemStatus.java
-|   |                       |   |       
-|   |                       |   +---repository
-|   |                       |   |       ItemQueryRepository.java
-|   |                       |   |       ItemQueryRepositoryImpl.java
-|   |                       |   |       ItemRepository.java
-|   |                       |   |       
-|   |                       |   \---service
-|   |                       |           ItemService.java
-|   |                       |           
-|   |                       +---member
-|   |                       |   +---controller
-|   |                       |   |       MemberController.java
-|   |                       |   |       
-|   |                       |   +---dto
-|   |                       |   |       LoginRequestDto.java
-|   |                       |   |       LoginResponseDto.java
-|   |                       |   |       MemberRequestDto.java
-|   |                       |   |       MemberResponseDto.java
-|   |                       |   |       
-|   |                       |   +---entity
-|   |                       |   |       CustomUserDetails.java
-|   |                       |   |       Member.java
-|   |                       |   |       
-|   |                       |   +---enums
-|   |                       |   |       MemberStatus.java
-|   |                       |   |       Role.java
-|   |                       |   |       
-|   |                       |   +---repository
-|   |                       |   |       MemberRepository.java
-|   |                       |   |       
-|   |                       |   \---service
-|   |                       |           CustomUserDetailsService.java
-|   |                       |           MemberService.java
-|   |                       |           RedisService.java
-|   |                       |           
-|   |                       +---order
-|   |                       |   +---controller
-|   |                       |   |       OrderController.java
-|   |                       |   |       
-|   |                       |   +---dto
-|   |                       |   |       OrderCancelRequestDto.java
-|   |                       |   |       OrderDetailResponseDto.java
-|   |                       |   |       OrderItemDetailDto.java
-|   |                       |   |       OrderItemRequestDto.java
-|   |                       |   |       OrderRequestDto.java
-|   |                       |   |       OrderResponseDto.java
-|   |                       |   |       OrderUpdateRequestDto.java
-|   |                       |   |       
-|   |                       |   +---entity
-|   |                       |   |       Order.java
-|   |                       |   |       OrderItem.java
-|   |                       |   |       
-|   |                       |   +---enums
-|   |                       |   |       DataStatus.java
-|   |                       |   |       OrderType.java
-|   |                       |   |       PaymentMethod.java
-|   |                       |   |       
-|   |                       |   +---repository
-|   |                       |   |       OrderRepository.java
-|   |                       |   |       OrderRepositoryCustom.java
-|   |                       |   |       OrderRepositoryImpl.java
-|   |                       |   |       
-|   |                       |   \---service
-|   |                       |           OrderService.java
-|   |                       |           
-|   |                       +---payment
-|   |                       |   +---controller
-|   |                       |   |       PaymentController.java
-|   |                       |   |       
-|   |                       |   +---dto
-|   |                       |   |       PaymentRequestDto.java
-|   |                       |   |       PaymentResponseDto.java
-|   |                       |   |       
-|   |                       |   +---entity
-|   |                       |   |       Payment.java
-|   |                       |   |       
-|   |                       |   +---enums
-|   |                       |   |       PaymentMethod.java
-|   |                       |   |       PaymentStatus.java
-|   |                       |   |       
-|   |                       |   +---repository
-|   |                       |   |       PaymentRepository.java
-|   |                       |   |       
-|   |                       |   \---service
-|   |                       |           PaymentService.java
-|   |                       |           
-|   |                       +---review
-|   |                       |   +---controller
-|   |                       |   |       ReviewController.java
-|   |                       |   |       ReviewOwnerController.java
-|   |                       |   |       
-|   |                       |   +---dto
-|   |                       |   |       ReviewCreationRequestDto.java
-|   |                       |   |       ReviewItemResponseDto.java
-|   |                       |   |       ReviewResponseDto.java
-|   |                       |   |       ReviewUpdateRequestDto.java
-|   |                       |   |       
-|   |                       |   +---entity
-|   |                       |   |       Review.java
-|   |                       |   |       ReviewStatus.java
-|   |                       |   |       
-|   |                       |   +---repository
-|   |                       |   |       ReviewCustomRepository.java
-|   |                       |   |       ReviewCustomRepositoryImpl.java
-|   |                       |   |       ReviewRepository.java
-|   |                       |   |       
-|   |                       |   \---service
-|   |                       |           ReviewService.java
-|   |                       |           
-|   |                       \---store
-|   |                           +---controller
-|   |                           |       StoreController.java
-|   |                           |       
-|   |                           +---dto
-|   |                           |       StoreRequestDto.java
-|   |                           |       StoreResponseDto.java
-|   |                           |       
-|   |                           +---entity
-|   |                           |       Store.java
-|   |                           |       StoreCategory.java
-|   |                           |       
-|   |                           +---enums
-|   |                           |       CategoryType.java
-|   |                           |       StoreStatus.java
-|   |                           |       
-|   |                           +---repository
-|   |                           |       StoreCategoryRepository.java
-|   |                           |       StoreRepository.java
-|   |                           |       
-|   |                           \---service
-|   |                                   StoreService.java
-|   |                                   
-|   \---resources
-|           application.yml
-|           
-\---test
-    \---java
-        \---com
-            \---sparta
-                \---tl3p
-                    \---backend
-                        |   BackendApplicationTests.java
-                        |   
-                        +---item
-                        |       ItemServiceTest.java
-                        |       
-                        +---order
-                        |       OrderServiceTest.java
-                        |       
-                        +---review
-                        |       ReviewServiceTest.java
-                        |       
-                        \---store
-                                StoreServiceTest.java
-                                
+📦 
+├─ .gitattributes
+├─ .gitignore
+├─ Dockerfile
+├─ Jenkinsfile
+├─ README.md
+├─ build.gradle
+├─ gradle
+│  └─ wrapper
+│     ├─ gradle-wrapper.jar
+│     └─ gradle-wrapper.properties
+├─ gradlew
+├─ gradlew.bat
+└─ src
+   ├─ main
+   │  └─ java
+   │     └─ com
+   │        └─ sparta
+   │           └─ tl3p
+   │              └─ backend
+   │                 ├─ BackendApplication.java
+   │                 ├─ common
+   │                 │  ├─ audit
+   │                 │  │  ├─ AuditorAwareImpl.java
+   │                 │  │  └─ BaseEntity.java
+   │                 │  ├─ config
+   │                 │  │  ├─ JpaConfig.java
+   │                 │  │  ├─ QueryDslConfig.java
+   │                 │  │  ├─ RedisConfig.java
+   │                 │  │  ├─ RestClientConfig.java
+   │                 │  │  ├─ SecurityConfig.java
+   │                 │  │  └─ SwaggerConfig.java
+   │                 │  ├─ dto
+   │                 │  │  ├─ ErrorResponseDto.java
+   │                 │  │  └─ SuccessResponseDto.java
+   │                 │  ├─ exception
+   │                 │  │  └─ BusinessException.java
+   │                 │  ├─ filter
+   │                 │  │  └─ JwtAuthenticationFilter.java
+   │                 │  ├─ handler
+   │                 │  │  └─ GlobalExceptionHandler.java
+   │                 │  ├─ type
+   │                 │  │  ├─ Address.java
+   │                 │  │  ├─ ErrorCode.java
+   │                 │  │  └─ ResponseCode.java
+   │                 │  └─ util
+   │                 │     ├─ GenerateSecretKey.java
+   │                 │     └─ JwtTokenProvider.java
+   │                 └─ domain
+   │                    ├─ ai
+   │                    │  ├─ controller
+   │                    │  │  └─ AIDescriptionController.java
+   │                    │  ├─ dto
+   │                    │  │  ├─ AIDescriptionRequestDto.java
+   │                    │  │  ├─ AIDescriptionResponseDto.java
+   │                    │  │  ├─ GeminiApiRequestDto.java
+   │                    │  │  └─ GeminiApiResponseDto.java
+   │                    │  ├─ entity
+   │                    │  │  └─ AIDescription.java
+   │                    │  ├─ repository
+   │                    │  │  └─ AIDescriptionRepository.java
+   │                    │  └─ service
+   │                    │     └─ AIDescriptionService.java
+   │                    ├─ item
+   │                    │  ├─ controller
+   │                    │  │  └─ ItemController.java
+   │                    │  ├─ dto
+   │                    │  │  ├─ ItemCreateRequestDto.java
+   │                    │  │  ├─ ItemPageResponseDto.java
+   │                    │  │  ├─ ItemResponseDto.java
+   │                    │  │  ├─ ItemSearchRequestDto.java
+   │                    │  │  └─ ItemUpdateRequestDto.java
+   │                    │  ├─ entity
+   │                    │  │  └─ Item.java
+   │                    │  ├─ enums
+   │                    │  │  ├─ ItemSortOption.java
+   │                    │  │  └─ ItemStatus.java
+   │                    │  ├─ repository
+   │                    │  │  ├─ ItemQueryRepository.java
+   │                    │  │  ├─ ItemQueryRepositoryImpl.java
+   │                    │  │  └─ ItemRepository.java
+   │                    │  └─ service
+   │                    │     └─ ItemService.java
+   │                    ├─ member
+   │                    │  ├─ controller
+   │                    │  │  └─ MemberController.java
+   │                    │  ├─ dto
+   │                    │  │  ├─ LoginRequestDto.java
+   │                    │  │  ├─ LoginResponseDto.java
+   │                    │  │  ├─ MemberRequestDto.java
+   │                    │  │  └─ MemberResponseDto.java
+   │                    │  ├─ entity
+   │                    │  │  ├─ CustomUserDetails.java
+   │                    │  │  └─ Member.java
+   │                    │  ├─ enums
+   │                    │  │  ├─ MemberStatus.java
+   │                    │  │  └─ Role.java
+   │                    │  ├─ repository
+   │                    │  │  └─ MemberRepository.java
+   │                    │  └─ service
+   │                    │     ├─ CustomUserDetailsService.java
+   │                    │     ├─ MemberService.java
+   │                    │     └─ RedisService.java
+   │                    ├─ order
+   │                    │  ├─ controller
+   │                    │  │  └─ OrderController.java
+   │                    │  ├─ dto
+   │                    │  │  ├─ OrderCancelRequestDto.java
+   │                    │  │  ├─ OrderDetailResponseDto.java
+   │                    │  │  ├─ OrderItemDetailDto.java
+   │                    │  │  ├─ OrderItemRequestDto.java
+   │                    │  │  ├─ OrderRequestDto.java
+   │                    │  │  ├─ OrderResponseDto.java
+   │                    │  │  └─ OrderUpdateRequestDto.java
+   │                    │  ├─ entity
+   │                    │  │  ├─ Order.java
+   │                    │  │  └─ OrderItem.java
+   │                    │  ├─ enums
+   │                    │  │  ├─ DataStatus.java
+   │                    │  │  ├─ OrderType.java
+   │                    │  │  └─ PaymentMethod.java
+   │                    │  ├─ repository
+   │                    │  │  ├─ OrderRepository.java
+   │                    │  │  ├─ OrderRepositoryCustom.java
+   │                    │  │  └─ OrderRepositoryImpl.java
+   │                    │  └─ service
+   │                    │     └─ OrderService.java
+   │                    ├─ payment
+   │                    │  ├─ controller
+   │                    │  │  └─ PaymentController.java
+   │                    │  ├─ dto
+   │                    │  │  ├─ PaymentRequestDto.java
+   │                    │  │  └─ PaymentResponseDto.java
+   │                    │  ├─ entity
+   │                    │  │  └─ Payment.java
+   │                    │  ├─ enums
+   │                    │  │  ├─ PaymentMethod.java
+   │                    │  │  └─ PaymentStatus.java
+   │                    │  ├─ repository
+   │                    │  │  └─ PaymentRepository.java
+   │                    │  └─ service
+   │                    │     └─ PaymentService.java
+   │                    ├─ review
+   │                    │  ├─ controller
+   │                    │  │  ├─ ReviewController.java
+   │                    │  │  └─ ReviewOwnerController.java
+   │                    │  ├─ dto
+   │                    │  │  ├─ ReviewCreationRequestDto.java
+   │                    │  │  ├─ ReviewItemResponseDto.java
+   │                    │  │  ├─ ReviewResponseDto.java
+   │                    │  │  └─ ReviewUpdateRequestDto.java
+   │                    │  ├─ entity
+   │                    │  │  ├─ Review.java
+   │                    │  │  └─ ReviewStatus.java
+   │                    │  ├─ repository
+   │                    │  │  ├─ ReviewCustomRepository.java
+   │                    │  │  ├─ ReviewCustomRepositoryImpl.java
+   │                    │  │  └─ ReviewRepository.java
+   │                    │  └─ service
+   │                    │     └─ ReviewService.java
+   │                    └─ store
+   │                       ├─ controller
+   │                       │  └─ StoreController.java
+   │                       ├─ dto
+   │                       │  ├─ StoreRequestDto.java
+   │                       │  └─ StoreResponseDto.java
+   │                       ├─ entity
+   │                       │  ├─ Store.java
+   │                       │  └─ StoreCategory.java
+   │                       ├─ enums
+   │                       │  ├─ CategoryType.java
+   │                       │  └─ StoreStatus.java
+   │                       ├─ repository
+   │                       │  ├─ StoreCategoryRepository.java
+   │                       │  └─ StoreRepository.java
+   │                       └─ service
+   │                          └─ StoreService.java
+   └─ test
+      └─ java
+         └─ com
+            └─ sparta
+               └─ tl3p
+                  └─ backend
+                     ├─ BackendApplicationTests.java
+                     ├─ item
+                     │  └─ ItemServiceTest.java
+                     ├─ order
+                     │  └─ OrderServiceTest.java
+                     ├─ review
+                     │  └─ ReviewServiceTest.java
+                     └─ store
+                        └─ StoreServiceTest.java
 
 ```
 </details>
