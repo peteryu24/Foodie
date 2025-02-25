@@ -130,7 +130,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ubuntu_key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} << 'EOF'
+                        ssh -o StrictHostKeyChecking=no ${env.releaseServerAccount}@${env.releaseServerUri} '
                             if [ \$(docker ps -q --filter "name=tl1p") ]; then
                                 docker stop tl1p
                                 docker rm tl1p
@@ -143,11 +143,12 @@ pipeline {
                                 --name tl1p \
                                 -p ${env.releasePort}:${env.releasePort} \
                                 -d $imageName:latest
-                        EOF
+                        '
                     """
                 }
             }
         }
+
 
     }
 }
