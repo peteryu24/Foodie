@@ -11,7 +11,7 @@
 | 유경철 | 팀원 | Store CRUD/검색 기능, Store 테스트 코드 작성 |
 
 # 서비스 구성 및 실행 방법
-
+ 
 ## 아키텍처
 
 ![Image](https://github.com/user-attachments/assets/6be73b5a-f393-4660-8cc8-d9a018100d43)
