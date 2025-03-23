@@ -5,7 +5,7 @@
 | 이름 | 역할 | 구현 기능 |
 | --- | --- | --- |
 | 이하은 | 팀장 | Review CRUD/검색 기능,  Review 테스트 코드 작성, 프로젝트 인프라 구축 및 배포, CI/CD |
-| 박성빈  | 팀원 | Order/Payment CRUD/검색 기능,  Order/Payment 테스트 코드 작성, 프로젝트 발표 |
+| 박성빈  | 팀원 | Order/Payment CRUD/검색 기능,  Order/Payment 테스트 코드 작성, 프로젝트 발표 |   
 | 이용재  | 팀원 | Member 인증/인가 기능 |
 | 이지웅 | 팀원 | Item CRUD/검색 기능,  AI API 연동, Item 테스트 코드 작성 | 
 | 유경철 | 팀원 | Store CRUD/검색 기능, Store 테스트 코드 작성 |
